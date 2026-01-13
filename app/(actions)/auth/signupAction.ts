@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { signupSchema, SignupValues } from "@/schemas/authSchema";
+import { redirect } from "next/navigation";
 import { success } from "zod";
 
 export async function signUpAction(values: SignupValues) {
@@ -33,5 +34,5 @@ export async function signUpAction(values: SignupValues) {
 
   // Başarılı / Success
   // Not: E-posta onayı açıksa kullanıcıdan onay istenir.
-  return { success: "Check your email to confirm your account!" };
+  redirect("/login");
 }

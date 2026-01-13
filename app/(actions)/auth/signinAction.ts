@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { loginSchema, LoginValues } from "@/schemas/authSchema";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export async function signInAction(values: LoginValues) {
   const validatedFields = loginSchema.safeParse(values);
@@ -14,17 +15,34 @@ export async function signInAction(values: LoginValues) {
   const supabase = await createClient();
 
   // 2. Giriş İşlemi / Sign In Process
-  const { error } = await supabase.auth.signInWithPassword({
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
 
-  if (error) {
+  if (authError || !user) {
     return { error: "Invalid credentials. Please try again." };
   }
+  // 2. Kullanıcının rolünü profilden çek / Fetch user role from profile
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profileError) return { error: "Profile not found." };
 
   // 3. Cache Temizleme ve Yönlendirme / Revalidate and Sync
   // Kullanıcı giriş yaptığı için layout ve header verilerinin yenilenmesini sağlarız.
   revalidatePath("/", "layout");
-  return { success: "Welcome back! Redirecting..." };
+
+  // 4. Role göre yönlendir / Redirect based on role
+  if (profile.role === "admin") {
+    redirect("/admin");
+  } else {
+    redirect("/");
+  }
 }
