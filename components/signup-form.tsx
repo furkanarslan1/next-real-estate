@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 
-// UI Bileşenleri / UI Components
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -23,8 +22,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { signupSchema, SignupValues } from "@/schemas/authSchema";
-
-// Şema ve Tipler / Schema and Types
+import { signUpAction } from "@/app/(actions)/auth/signupAction";
+import { toast } from "sonner";
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   // 1. Form tanımlaması / Form definition
@@ -42,9 +41,32 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
 
   // 2. Form gönderimi / Form submission logic
   async function onSubmit(values: SignupValues) {
-    console.log("Form Submitted:", values);
-    // Buraya Supabase Auth fonksiyonu gelecek.
-    // Supabase Auth function will be added here.
+    // 1. İşlem başladığında bilgi ver / Inform when process starts
+    const loadingToast = toast.loading("Creating your account...");
+    try {
+      const result = await signUpAction(values);
+      if (result?.error) {
+        console.error(result.error);
+        toast.error("Registration failed", {
+          description: result.error,
+          id: loadingToast, // Mevcut toast'u güncellemek için id kullanıyoruz
+        });
+        return;
+      }
+
+      // Başarılı / Success
+      toast.success("Account created successfully!", {
+        description: "Please check your email to verify your account.",
+        id: loadingToast,
+      });
+
+      // Formu temizle / Reset the form
+      form.reset();
+    } catch (error) {
+      toast.error("An unexpected error occurred", {
+        id: loadingToast,
+      });
+    }
   }
 
   return (
