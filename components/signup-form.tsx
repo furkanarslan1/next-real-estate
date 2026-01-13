@@ -126,6 +126,10 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                   <FormControl>
                     <Input type="password" {...field} />
                   </FormControl>
+                  {/* Kullanıcıya şifre kriterlerini hatırlatıyoruz */}
+                  <p className="text-[0.8rem] text-muted-foreground">
+                    At least 8 characters, one uppercase letter and one number.
+                  </p>
                   <FormMessage />
                 </FormItem>
               )}
