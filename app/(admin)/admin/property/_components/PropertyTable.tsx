@@ -26,6 +26,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { deleteProperty } from "@/app/(actions)/property/deleteProperty";
 
 export interface Property {
   id: string;
@@ -42,6 +44,49 @@ interface PropertyTableProps {
 }
 
 export default function PropertyTable({ data }: PropertyTableProps) {
+  /**
+   * Handles the deletion process of a property including user confirmation and server action call.
+   * Bir mülkün silinme sürecini, kullanıcı onayını ve server action çağrısını yönetir.
+   */
+  const handleDelete = async (id: string, images: string[] | null) => {
+    // 1. Ask for user confirmation (UX Safety)
+    // 1. Kullanıcıdan onay iste (UX Güvenliği)
+    const isConfirmed = confirm(
+      "Are you sure? This will delete the property and all its images permanently."
+    );
+
+    if (!isConfirmed) return;
+
+    // 2. Start loading state with a toast notification
+    // 2. Toast bildirimi ile yükleme durumunu başlat
+    const loadingToast = toast.loading("Processing your request...");
+
+    try {
+      // 3. Trigger the Server Action to delete from DB and Storage
+      // 3. Veritabanından ve Storage'dan silmek için Server Action'ı tetikle
+      const result = await deleteProperty(id, images);
+
+      // 4. Close the loading toast
+      // 4. Yükleme toast'unu kapat
+      toast.dismiss(loadingToast);
+
+      if (result.success) {
+        // 5. Success feedback - Table will auto-refresh due to revalidatePath
+        // 5. Başarı geri bildirimi - revalidatePath sayesinde tablo otomatik yenilenir
+        toast.success("Property deleted successfully");
+      } else {
+        // 6. Error feedback if server action fails
+        // 6. Server action başarısız olursa hata geri bildirimi
+        toast.error(`Error: ${result.error}`);
+      }
+    } catch (err) {
+      // 7. Generic catch block for unexpected client-side errors
+      // 7. Beklenmedik istemci tarafı hataları için genel yakalama bloğu
+      toast.dismiss(loadingToast);
+      console.error("Client-side delete error:", err);
+      toast.error("An unexpected error occurred during deletion.");
+    }
+  };
   return (
     <Table>
       <TableHeader>
@@ -132,7 +177,18 @@ export default function PropertyTable({ data }: PropertyTableProps) {
                       <Pencil className="mr-2 h-4 w-4" /> Edit
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-red-600 focus:bg-red-50 focus:text-red-600">
+                    <DropdownMenuItem
+                      className="text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
+                      onSelect={(e) => {
+                        // 1. Prevent dropdown from closing immediately if needed
+                        // 1. Gerekirse dropdown'ın hemen kapanmasını engelle
+                        // e.preventDefault();
+
+                        // 2. Trigger the delete handler with property ID and image list
+                        // 2. Mülk ID'si ve resim listesiyle silme işleyicisini tetikle
+                        handleDelete(item.id, item.images);
+                      }}
+                    >
                       <Trash2 className="mr-2 h-4 w-4" /> Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>
