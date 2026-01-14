@@ -1,0 +1,143 @@
+"use client";
+
+import { UseFormReturn } from "react-hook-form";
+import { propertySchema } from "@/schemas/propertySchema";
+import z from "zod";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+// Defining types from the schema
+// Şemadan tipleri tanımlıyoruz
+type PropertyFormInput = z.input<typeof propertySchema>;
+
+interface StepBasicInfoProps {
+  form: UseFormReturn<PropertyFormInput>;
+}
+
+export function StepBasicInfo({ form }: StepBasicInfoProps) {
+  return (
+    <div className="space-y-6 animate-in fade-in duration-500">
+      {/* Title / Başlık */}
+      <FormField
+        control={form.control}
+        name="title"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Listing Title</FormLabel>
+            <FormControl>
+              <Input
+                placeholder="e.g. Luxury Apartment in City Center"
+                {...field}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {/* Category and Status / Kategori ve Durum */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormField
+          control={form.control}
+          name="category"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Category</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="konut">Residential (Konut)</SelectItem>
+                  <SelectItem value="is_yeri">Commercial (İş Yeri)</SelectItem>
+                  <SelectItem value="arsa">Land (Arsa)</SelectItem>
+                  <SelectItem value="proje">Project (Proje)</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Status</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="satilik">For Sale (Satılık)</SelectItem>
+                  <SelectItem value="kiralik">For Rent (Kiralık)</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
+      {/* Price / Fiyat */}
+      <FormField
+        control={form.control}
+        name="price"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Price</FormLabel>
+            <FormControl>
+              <Input
+                type="number"
+                placeholder="Enter amount"
+                {...field}
+                // Explicitly cast unknown to string/number for the HTML input
+                // HTML input için unknown değeri açıkça string veya number'a çeviriyoruz
+                value={field.value as number | string}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {/* Description / Açıklama */}
+      <FormField
+        control={form.control}
+        name="description"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Detailed Description</FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder="Write all details about the property..."
+                className="min-h-37.5 resize-none"
+                {...field}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </div>
+  );
+}
