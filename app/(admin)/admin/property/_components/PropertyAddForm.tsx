@@ -10,6 +10,7 @@ import z from "zod";
 import { StepBasicInfo } from "./steps/StepBasicInfo";
 import { Form } from "@/components/ui/form";
 import { StepLocation } from "./steps/StepLocation";
+import { StepFeatures } from "./steps/StepFeatures";
 
 export default function PropertyAddForm() {
   const router = useRouter();
@@ -71,6 +72,9 @@ export default function PropertyAddForm() {
       ];
     } else if (step === 2) {
       fieldsToValidate = ["city_id", "district_id", "neighborhood_id"];
+    } else if (step === 3) {
+      // Dynamic fields under category_data
+      fieldsToValidate = ["category_data"];
     }
 
     const isValid = await form.trigger(fieldsToValidate as any);
@@ -91,11 +95,7 @@ export default function PropertyAddForm() {
           {/* ADIMLAR BURAYA GELECEK */}
           {step === 1 && <StepBasicInfo form={form} />}
           {step === 2 && <StepLocation form={form} />}
-          {step === 3 && (
-            <div className="p-10 border border-dashed text-center">
-              Step 3: Features (Soon)
-            </div>
-          )}
+          {step === 3 && <StepFeatures form={form} />}
           {step === 4 && (
             <div className="p-10 border border-dashed text-center">
               Step 4: Images (Soon)
