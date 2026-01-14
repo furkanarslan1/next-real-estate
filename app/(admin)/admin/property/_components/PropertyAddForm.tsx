@@ -9,6 +9,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import z from "zod";
 import { StepBasicInfo } from "./steps/StepBasicInfo";
 import { Form } from "@/components/ui/form";
+import { StepLocation } from "./steps/StepLocation";
 
 export default function PropertyAddForm() {
   const router = useRouter();
@@ -58,20 +59,22 @@ export default function PropertyAddForm() {
   };
 
   const handleNext = async () => {
-    // Validate only fields for Step 1
-    // Sadece 1. Adım alanlarını doğrula
-    const fieldsStep1 = ["title", "description", "category", "status", "price"];
+    let fieldsToValidate: any[] = [];
 
-    // Trigger validation / Doğrulamayı tetikle
-    const isValid = await form.trigger(fieldsStep1 as any);
-
-    if (isValid) {
-      setStep(step + 1);
-    } else {
-      // Optional: Scroll to first error
-      // İsteğe bağlı: İlk hataya kaydır
-      console.log("Validation failed for Step 1");
+    if (step === 1) {
+      fieldsToValidate = [
+        "title",
+        "description",
+        "category",
+        "status",
+        "price",
+      ];
+    } else if (step === 2) {
+      fieldsToValidate = ["city_id", "district_id", "neighborhood_id"];
     }
+
+    const isValid = await form.trigger(fieldsToValidate as any);
+    if (isValid) setStep(step + 1);
   };
 
   const onSubmit: SubmitHandler<PropertyFormInput> = async (values) => {
@@ -87,11 +90,7 @@ export default function PropertyAddForm() {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* ADIMLAR BURAYA GELECEK */}
           {step === 1 && <StepBasicInfo form={form} />}
-          {step === 2 && (
-            <div className="p-10 border border-dashed text-center">
-              Step 2: Location (Soon)
-            </div>
-          )}
+          {step === 2 && <StepLocation form={form} />}
           {step === 3 && (
             <div className="p-10 border border-dashed text-center">
               Step 3: Features (Soon)
