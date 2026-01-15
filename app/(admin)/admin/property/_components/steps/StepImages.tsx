@@ -8,10 +8,10 @@ import { FormLabel, FormItem } from "@/components/ui/form";
 import { X, UploadCloud, Loader2, Star } from "lucide-react";
 import imageCompression from "browser-image-compression";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner"; // Toast eklemeyi unutma
 
 type PropertyFormInput = z.input<typeof propertySchema>;
 
-// Resim dosya yapısı için tip tanımı
 export interface ImageFile {
   file: File;
   preview: string;
@@ -20,7 +20,6 @@ export interface ImageFile {
 
 interface StepImagesProps {
   form: UseFormReturn<PropertyFormInput>;
-  // Üst bileşene dosyaları göndermek için callback
   onImagesChange: (images: ImageFile[]) => void;
 }
 
@@ -29,30 +28,70 @@ export function StepImages({ form, onImagesChange }: StepImagesProps) {
   const [isCompressing, setIsCompressing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Dosyalar her değiştiğinde hem Form state'ini hem de üst bileşeni güncelle
+  // Security & Optimization Limits / Güvenlik ve Optimizasyon Limitleri
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB (Compression öncesi ham dosya limiti)
+  const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+
   useEffect(() => {
     form.setValue(
       "images",
       imageFiles.map((img) => img.file.name),
-      {
-        shouldValidate: true,
-      }
+      { shouldValidate: true }
     );
     onImagesChange(imageFiles);
   }, [imageFiles, form, onImagesChange]);
 
+  /**
+   * Validates files before processing
+   * Dosyaları işlemeden önce doğrular
+   */
+  const validateFile = (file: File): boolean => {
+    if (!ACCEPTED_TYPES.includes(file.type)) {
+      toast.error(
+        `Unsupported format: ${file.name}. Please use JPG, PNG or WEBP.`
+      );
+      return false;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error(
+        `File too large: ${file.name}. Maximum limit is 5MB before compression.`
+      );
+      return false;
+    }
+    return true;
+  };
+
   const processFiles = async (files: FileList | File[]) => {
+    const rawFiles = Array.from(files);
+
+    // Filter out invalid files / Geçersiz dosyaları ayıkla
+    const validFiles = rawFiles.filter(validateFile);
+
+    if (validFiles.length === 0) return;
+
     setIsCompressing(true);
+
+    // Compression options / Sıkıştırma ayarları
     const options = {
-      maxSizeMB: 1,
+      maxSizeMB: 1, // Aim for 1MB / 1MB hedefle
       maxWidthOrHeight: 1920,
       useWebWorker: true,
     };
 
     try {
       const newImages: ImageFile[] = [];
-      for (const file of Array.from(files)) {
+
+      for (const file of validFiles) {
+        // Step 1: Compress the image / Resmi sıkıştır
         const compressed = await imageCompression(file, options);
+
+        // Step 2: Check compressed size again (extra safety) / Ek güvenlik kontrolü
+        if (compressed.size > 2 * 1024 * 1024) {
+          toast.warning(
+            `${file.name} is still over 2MB after compression. Performance might be affected.`
+          );
+        }
+
         newImages.push({
           file: compressed,
           preview: URL.createObjectURL(compressed),
@@ -62,6 +101,7 @@ export function StepImages({ form, onImagesChange }: StepImagesProps) {
 
       setImageFiles((prev) => {
         const combined = [...prev, ...newImages];
+        // Ensure at least one image is cover / En az bir resmin kapak olduğundan emin ol
         if (!combined.some((img) => img.isCover) && combined.length > 0) {
           combined[0].isCover = true;
         }
@@ -69,16 +109,19 @@ export function StepImages({ form, onImagesChange }: StepImagesProps) {
       });
     } catch (error) {
       console.error("Compression error:", error);
+      toast.error("An error occurred while processing images.");
     } finally {
       setIsCompressing(false);
+      // Reset input value to allow selecting same file again
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
+  // ... (setAsCover and removeImage functions remain the same)
   const setAsCover = (index: number) => {
     setImageFiles((prev) => {
       const newFiles = [...prev];
       const [selected] = newFiles.splice(index, 1);
-      // Seçileni en başa koy ve isCover yap
       return [
         { ...selected, isCover: true },
         ...newFiles.map((img) => ({ ...img, isCover: false })),
@@ -89,7 +132,7 @@ export function StepImages({ form, onImagesChange }: StepImagesProps) {
   const removeImage = (index: number) => {
     setImageFiles((prev) => {
       const updated = prev.filter((_, i) => i !== index);
-      if (prev[index].isCover && updated.length > 0) {
+      if (prev[index]?.isCover && updated.length > 0) {
         updated[0].isCover = true;
       }
       return updated;
@@ -98,6 +141,7 @@ export function StepImages({ form, onImagesChange }: StepImagesProps) {
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
+      {/* ... UI Elements (Keep your existing drag & drop UI here) */}
       <FormItem>
         <FormLabel className="text-lg font-bold">
           Property Photos ({imageFiles.length})
@@ -124,6 +168,7 @@ export function StepImages({ form, onImagesChange }: StepImagesProps) {
             multiple
             hidden
             ref={fileInputRef}
+            accept={ACCEPTED_TYPES.join(",")}
             onChange={(e) => e.target.files && processFiles(e.target.files)}
           />
           {isCompressing ? (
@@ -136,12 +181,13 @@ export function StepImages({ form, onImagesChange }: StepImagesProps) {
               Drop images or click to browse
             </p>
             <p className="text-muted-foreground text-sm">
-              Compressed automatically for better SEO performance
+              Max 5MB per file. Supports JPG, PNG, WEBP.
             </p>
           </div>
         </div>
       </FormItem>
 
+      {/* Grid rendering remains same */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {imageFiles.map((img, index) => (
           <div
@@ -179,11 +225,6 @@ export function StepImages({ form, onImagesChange }: StepImagesProps) {
                 {img.isCover ? "Main Photo" : "Set as Main"}
               </Button>
             </div>
-            {img.isCover && (
-              <div className="absolute top-2 left-2 bg-primary text-white p-1 rounded-md">
-                <Star size={12} fill="currentColor" />
-              </div>
-            )}
           </div>
         ))}
       </div>

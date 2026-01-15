@@ -16,6 +16,7 @@ import { StepLocation } from "./steps/StepLocation";
 import { StepFeatures } from "./steps/StepFeatures";
 import { StepImages, ImageFile } from "./steps/StepImages";
 import { Loader2 } from "lucide-react";
+import { addPropertyAction } from "@/app/(actions)/property/addPropertyAction";
 
 // Use input for form initialization, infer for clean data
 // Form başlatma için 'input', temiz veri için 'infer' kullanıyoruz
@@ -78,14 +79,10 @@ export default function PropertyAddForm() {
     if (step < 4) {
       setStep(step + 1);
     } else {
-      // Final parse check with Zod before submission
-      // Gönderimden önce Zod ile son bir ayrıştırma kontrolü
-      const result = propertySchema.safeParse(form.getValues());
-      if (!result.success) {
-        toast.error("Form data is invalid. Please check your entries.");
-        return;
-      }
-      await onSubmit(result.data);
+      // Final Zod check before calling onSubmit
+      // onSubmit'i çağırmadan önce son Zod kontrolü
+      const values = form.getValues();
+      await onSubmit(values);
     }
   };
 
@@ -140,23 +137,17 @@ export default function PropertyAddForm() {
       // Wait for all uploads to complete / Tüm yüklemelerin bitmesini bekle
       const uploadedUrls = await Promise.all(uploadPromises);
 
-      // 3. Database Record / Veritabanı Kaydı
-      const { error: dbError } = await supabase.from("properties").insert({
-        title: values.title,
-        description: values.description,
-        price: Number(values.price),
-        category: values.category,
-        status: values.status,
-        city_id: Number(values.city_id),
-        district_id: Number(values.district_id),
-        neighborhood_id: Number(values.neighborhood_id),
-        category_data: values.category_data,
-        images: uploadedUrls,
-        user_id: user.id,
-      });
+      // 3. CALL SERVER ACTION / Server Action'ı Çağır
+      // We pass the data, uploaded links, and user ID
+      // Verileri, yüklenen linkleri ve kullanıcı ID'sini gönderiyoruz
 
-      if (dbError) throw dbError;
+      const result = await addPropertyAction(values, uploadedUrls);
 
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      // Success: Redirect / Başarı: Yönlendir
       router.push("/admin/property?message=PropertyCreated");
     } catch (error: any) {
       console.error("Submit Error ", error);
