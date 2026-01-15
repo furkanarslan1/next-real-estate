@@ -87,6 +87,17 @@ export default function PropertyAddForm() {
   };
 
   const onSubmit = async (values: PropertyFormInput) => {
+    // 1. Final Client-side Validation & Transformation
+    // Resim yükleme maliyetine girmeden önce temiz veriyi al
+    const validationResult = propertySchema.safeParse(values);
+
+    if (!validationResult.success) {
+      toast.error("Please check the form for errors.");
+      return;
+    }
+
+    // result.data artık 'PropertyValues' tipindedir ve tertemizdir!
+    const cleanValues = validationResult.data;
     // Keep track of successfully uploaded paths for cleanup in case of error
     // Hata durumunda temizlik yapmak için başarıyla yüklenen yolları takip et
     const successfulUploads: string[] = [];
@@ -141,7 +152,7 @@ export default function PropertyAddForm() {
       // We pass the data, uploaded links, and user ID
       // Verileri, yüklenen linkleri ve kullanıcı ID'sini gönderiyoruz
 
-      const result = await addPropertyAction(values, uploadedUrls);
+      const result = await addPropertyAction(cleanValues, uploadedUrls);
 
       if (!result.success) {
         throw new Error(result.error);
