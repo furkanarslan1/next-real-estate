@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import PropertyTable from "./_components/PropertyTable";
 import { PropertySearchFilters } from "./_components/PropertySearchFilters";
+import ToastHandler from "./_components/ToastHandler";
 
 export default async function PropertyListPage({
   searchParams,
@@ -29,6 +30,10 @@ export default async function PropertyListPage({
 
   return (
     <div className="space-y-6 p-6">
+      {/* This handler will check URL for "message=PropertyCreated" 
+        Bu işleyici URL'de "message=PropertyCreated" var mı kontrol eder
+      */}
+      <ToastHandler />
       <h1 className="text-3xl font-bold">Properties Management</h1>
       <div className="rounded-md border bg-white shadow-sm overflow-hidden">
         <PropertySearchFilters />

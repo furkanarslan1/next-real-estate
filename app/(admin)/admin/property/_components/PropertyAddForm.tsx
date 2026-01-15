@@ -17,7 +17,10 @@ import { StepFeatures } from "./steps/StepFeatures";
 import { StepImages, ImageFile } from "./steps/StepImages";
 import { Loader2 } from "lucide-react";
 
+// Use input for form initialization, infer for clean data
+// Form başlatma için 'input', temiz veri için 'infer' kullanıyoruz
 type PropertyFormInput = z.input<typeof propertySchema>;
+type PropertyValues = z.infer<typeof propertySchema>;
 
 export default function PropertyAddForm() {
   const router = useRouter();
@@ -60,6 +63,8 @@ export default function PropertyAddForm() {
   };
 
   const handleNext = async () => {
+    // Definitive mapping of fields per step to avoid missing validations
+    // Eksik doğrulama kalmaması için her adımın alanlarını kesin olarak eşleştiriyoruz
     const stepFields: Record<number, Array<keyof PropertyFormInput>> = {
       1: ["title", "description", "category", "status", "price"],
       2: ["city_id", "district_id", "neighborhood_id"],
@@ -73,33 +78,39 @@ export default function PropertyAddForm() {
     if (step < 4) {
       setStep(step + 1);
     } else {
-      const values = form.getValues();
-      await onSubmit(values);
+      // Final parse check with Zod before submission
+      // Gönderimden önce Zod ile son bir ayrıştırma kontrolü
+      const result = propertySchema.safeParse(form.getValues());
+      if (!result.success) {
+        toast.error("Form data is invalid. Please check your entries.");
+        return;
+      }
+      await onSubmit(result.data);
     }
   };
 
   const onSubmit = async (values: PropertyFormInput) => {
+    // Keep track of successfully uploaded paths for cleanup in case of error
+    // Hata durumunda temizlik yapmak için başarıyla yüklenen yolları takip et
+    const successfulUploads: string[] = [];
     try {
       setIsSubmitting(true);
       const supabase = createClient();
 
-      // 1. Kullanıcı Kontrolü (İşlem başında yapalım ki boşuna resim yüklemesin)
+      // 1. Auth Check / Kullanıcı Kontrolü
       const {
         data: { user },
         error: userError,
       } = await supabase.auth.getUser();
       if (userError || !user)
-        throw new Error("Oturum bulunamadı, lütfen tekrar giriş yapın.");
+        throw new Error("Session not found, please log in again.");
 
-      // 2. Resimleri Storage'a Yükle
-      const uploadedUrls: string[] = [];
+      if (capturedFiles.length === 0)
+        throw new Error("Please upload at least one picture.");
 
-      // Eğer hiç resim seçilmemişse uyarı ver (Tabloda zorunlu değilse geçebilirsin)
-      if (capturedFiles.length === 0) {
-        throw new Error("Lütfen en az bir resim yükleyin.");
-      }
-
-      for (const imgObj of capturedFiles) {
+      // 2. Parallel Upload with Promise.all / Promise.all ile Paralel Yükleme
+      // We start all uploads at the same time / Tüm yüklemeleri aynı anda başlatıyoruz
+      const uploadPromises = capturedFiles.map(async (imgObj) => {
         const fileExt = imgObj.file.name.split(".").pop();
         const fileName = `${crypto.randomUUID()}.${fileExt}`;
         const filePath = `${fileName}`;
@@ -109,19 +120,27 @@ export default function PropertyAddForm() {
           .upload(filePath, imgObj.file);
 
         if (uploadError) {
-          console.error("Storage Error:", uploadError);
-          throw new Error("Resim yüklenirken hata oluştu.");
+          // Log individual errors / Münferit hataları logla
+          console.error(`Upload failed for ${imgObj.file.name}:`, uploadError);
+          throw new Error(`Failed to upload: ${imgObj.file.name}`);
         }
 
+        // Track successful upload for potential cleanup
+        // Olası bir temizlik işlemi için başarılı yüklemeyi listeye ekle
+        successfulUploads.push(filePath);
+
+        // Get Public URL after successful upload / Yükleme başarılıysa URL'i al
         const {
           data: { publicUrl },
         } = supabase.storage.from("property-images").getPublicUrl(filePath);
 
-        uploadedUrls.push(publicUrl);
-      }
+        return publicUrl;
+      });
 
-      // 3. Veritabanı Kaydı (Explicit Mapping - Her alanı elle eşleştiriyoruz)
-      // Bu yöntem RLS hatalarını önlemek için en güvenli yoldur.
+      // Wait for all uploads to complete / Tüm yüklemelerin bitmesini bekle
+      const uploadedUrls = await Promise.all(uploadPromises);
+
+      // 3. Database Record / Veritabanı Kaydı
       const { error: dbError } = await supabase.from("properties").insert({
         title: values.title,
         description: values.description,
@@ -132,25 +151,28 @@ export default function PropertyAddForm() {
         district_id: Number(values.district_id),
         neighborhood_id: Number(values.neighborhood_id),
         category_data: values.category_data,
-        images: uploadedUrls, // Formdaki değil, storage'dan gelen linkler
+        images: uploadedUrls,
         user_id: user.id,
       });
 
-      if (dbError) {
-        console.error("Database Error Details:", dbError);
-        throw dbError;
-      }
+      if (dbError) throw dbError;
 
-      toast.success("Property added successfully!");
-
-      // Formu temizle ve ilk adıma dön
-      form.reset();
-      setCapturedFiles([]);
-      router.push("/admin/property");
-      router.refresh();
+      router.push("/admin/property?message=PropertyCreated");
     } catch (error: any) {
-      console.error("Submit Error:", error);
-      toast.error(error.message || "Bir hata oluştu.");
+      console.error("Submit Error ", error);
+
+      // CLEANUP LOGIC / TEMİZLİK MANTIĞI
+      // If we have uploaded files but the process failed, delete them from storage
+      // Eğer yüklenen dosyalar varsa ama işlem başarısız olduysa, onları depolamadan sil
+      if (successfulUploads.length > 0) {
+        const supabase = createClient();
+        await supabase.storage
+          .from("property-images")
+          .remove(successfulUploads);
+
+        console.log("Cleanup complete: Orphaned files removed");
+      }
+      toast.error(error.message || "An error occurred.");
     } finally {
       setIsSubmitting(false);
     }
