@@ -19,6 +19,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useEffect, useRef } from "react";
+
+const EMPTY_CATEGORY_DATA = {
+  room_count: "",
+  building_age: "",
+  floor_number: "",
+  heating: "",
+  bathrooms: "",
+  balconies: "",
+  in_site: false,
+  zoning_status: "",
+  ada: "",
+  parsel: "",
+};
 
 // Defining types from the schema
 // Şemadan tipleri tanımlıyoruz
@@ -29,6 +43,31 @@ interface StepBasicInfoProps {
 }
 
 export function StepBasicInfo({ form }: StepBasicInfoProps) {
+  // Watch the category field / Kategori alanını izle
+  const category = form.watch("category");
+
+  // Create a flag to track the first render
+  // İlk render'ı takip etmek için bir bayrak (flag) oluşturuyoruz
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    // 1. If it's the first time the component loads, do nothing
+    // 1. Bileşen ilk yüklendiğinde (mount) hiçbir şey yapma
+    if (isFirstRender.current) {
+      isFirstRender.current = false; // Mark it as no longer first render / Artık ilk render değil diye işaretle
+      return;
+    }
+
+    // 2. Only reset if the category actually changes AFTER the initial load
+    // 2. Sadece ilk yüklemeden SONRA kategori gerçekten değişirse sıfırla
+    form.setValue("category_data", EMPTY_CATEGORY_DATA);
+
+    // 2. Kırmızı hata mesajlarını temizle (UX iyileştirmesi)
+    // Kullanıcı yeni kategoriye "temiz bir sayfa" ile başlasın
+    // 2. Remove red error messages (UX improvement) // Allow users to start with a "clean slate" in the new category
+    form.clearErrors("category_data");
+  }, [category, form]);
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       {/* Title / Başlık */}
@@ -51,7 +90,7 @@ export function StepBasicInfo({ form }: StepBasicInfoProps) {
 
       {/* Category and Status / Kategori ve Durum */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField
+        {/* <FormField
           control={form.control}
           name="category"
           render={({ field }) => (
@@ -68,6 +107,55 @@ export function StepBasicInfo({ form }: StepBasicInfoProps) {
                   <SelectItem value="is_yeri">Commercial (İş Yeri)</SelectItem>
                   <SelectItem value="arsa">Land (Arsa)</SelectItem>
                   <SelectItem value="proje">Project (Proje)</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        /> */}
+
+        {/* Category / Kategori */}
+        <FormField
+          control={form.control}
+          name="category"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Category</FormLabel>
+              {/* defaultValue yerine value ekledik / Switched defaultValue to value */}
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="konut">Residential (Konut)</SelectItem>
+                  <SelectItem value="is_yeri">Commercial (İş Yeri)</SelectItem>
+                  <SelectItem value="arsa">Land (Arsa)</SelectItem>
+                  <SelectItem value="proje">Project (Proje)</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Status  */}
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Status</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="satilik">For Sale (Satılık)</SelectItem>
+                  <SelectItem value="kiralik">For Rent (Kiralık)</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
