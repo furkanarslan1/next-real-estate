@@ -11,6 +11,12 @@ export const propertySchema = z.object({
   city_id: z.coerce.number().min(1).transform(Number),
   district_id: z.coerce.number().min(1).transform(Number),
   neighborhood_id: z.coerce.number().min(1).transform(Number),
+  area_gross: z.coerce
+    .number()
+    .min(1, { message: "Gross area must be greater than 0" }),
+  area_net: z.coerce
+    .number()
+    .min(1, { message: "Net area must be greater than 0" }),
 
   category_data: z
     .object({

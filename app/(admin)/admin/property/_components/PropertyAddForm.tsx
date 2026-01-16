@@ -38,6 +38,8 @@ export default function PropertyAddForm() {
       category: "konut",
       status: "satilik",
       price: 0,
+      area_gross: 0,
+      area_net: 0,
       city_id: 0,
       district_id: 0,
       neighborhood_id: 0,

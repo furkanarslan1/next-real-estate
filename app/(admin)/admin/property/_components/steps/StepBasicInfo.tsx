@@ -26,6 +26,7 @@ const EMPTY_CATEGORY_DATA = {
   building_age: "",
   floor_number: "",
   heating: "",
+
   bathrooms: "",
   balconies: "",
   in_site: false,
@@ -88,33 +89,10 @@ export function StepBasicInfo({ form }: StepBasicInfoProps) {
         )}
       />
 
-      {/* Category and Status / Kategori ve Durum */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* <FormField
-          control={form.control}
-          name="category"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Category</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="konut">Residential (Konut)</SelectItem>
-                  <SelectItem value="is_yeri">Commercial (İş Yeri)</SelectItem>
-                  <SelectItem value="arsa">Land (Arsa)</SelectItem>
-                  <SelectItem value="proje">Project (Proje)</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        /> */}
-
         {/* Category / Kategori */}
+        {/* Category and Status / Kategori ve Durum */}
+
         <FormField
           control={form.control}
           name="category"
@@ -158,6 +136,44 @@ export function StepBasicInfo({ form }: StepBasicInfoProps) {
                   <SelectItem value="kiralik">For Rent (Kiralık)</SelectItem>
                 </SelectContent>
               </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="area_gross"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>m² (Gross)</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  placeholder="Enter m2"
+                  {...field}
+                  value={(field.value as number | string) ?? ""}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="area_net"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>m² (Net)</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  placeholder="Enter m2"
+                  {...field}
+                  value={(field.value as number | string) ?? ""}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
