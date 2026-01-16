@@ -32,7 +32,7 @@ export async function addPropertyAction(
   const ip = headerList.get("x-forwarded-for") || "unknown";
 
   // Check rate limit / İstek sınırını kontrol et
-  const { isRateLimited } = rateLimit(ip);
+  const { isRateLimited } = rateLimit.check(5, ip);
   if (isRateLimited) {
     return {
       success: false,
