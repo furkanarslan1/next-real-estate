@@ -18,12 +18,16 @@ import { StepImages, ImageFile } from "./steps/StepImages";
 import { Loader2 } from "lucide-react";
 import { addPropertyAction } from "@/app/(actions)/property/addPropertyAction";
 
+interface PropertyAddFormProps {
+  initialData?: PropertyValues & { id: string };
+}
+
 // Use input for form initialization, infer for clean data
 // Form başlatma için 'input', temiz veri için 'infer' kullanıyoruz
 type PropertyFormInput = z.input<typeof propertySchema>;
 type PropertyValues = z.infer<typeof propertySchema>;
 
-export default function PropertyAddForm() {
+export default function PropertyAddForm({ initialData }: PropertyAddFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const step = Number(searchParams.get("step") ?? 1);
@@ -32,42 +36,57 @@ export default function PropertyAddForm() {
 
   const form = useForm<PropertyFormInput>({
     resolver: zodResolver(propertySchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      category: "konut",
-      status: "satilik",
-      price: 0,
-      area_gross: 0,
-      area_net: 0,
-      city_id: 0,
-      district_id: 0,
-      neighborhood_id: 0,
-      category_data: {
-        room_count: "",
-        building_age: "",
-        floor_number: "",
-        total_floor: "",
-        heating: "natural gas",
-        bathrooms: "",
-        balconies: "",
-        zoning_status: "",
-        ada: "",
-        parsel: "",
+    defaultValues: initialData
+      ? {
+          title: initialData.title,
+          description: initialData.description,
+          category: initialData.category,
+          status: initialData.status,
+          price: Number(initialData.price),
+          area_gross: Number(initialData.area_gross),
+          area_net: Number(initialData.area_net),
+          city_id: Number(initialData.city_id),
+          district_id: Number(initialData.district_id),
+          neighborhood_id: Number(initialData.neighborhood_id),
+          category_data: initialData.category_data,
+          images: initialData.images || [],
+        }
+      : {
+          title: "",
+          description: "",
+          category: "konut",
+          status: "satilik",
+          price: 0,
+          area_gross: 0,
+          area_net: 0,
+          city_id: 0,
+          district_id: 0,
+          neighborhood_id: 0,
+          category_data: {
+            room_count: "",
+            building_age: "",
+            floor_number: "",
+            total_floor: "",
+            heating: "natural gas",
+            bathrooms: "",
+            balconies: "",
+            zoning_status: "",
+            ada: "",
+            parsel: "",
 
-        kitchen: "closed",
-        elevator: "yes",
-        parking: "no",
-        usage_status: "vacant",
+            kitchen: "closed",
+            elevator: "yes",
+            parking: "no",
+            usage_status: "vacant",
 
-        maintenance_fee: 0,
+            maintenance_fee: 0,
 
-        furnished: false,
-        swap: false,
-        in_site: false,
-      },
-      images: [],
-    },
+            furnished: false,
+            swap: false,
+            in_site: false,
+          },
+          images: [],
+        },
   });
 
   const setStep = (newStep: number) => {
@@ -80,7 +99,15 @@ export default function PropertyAddForm() {
     // Definitive mapping of fields per step to avoid missing validations
     // Eksik doğrulama kalmaması için her adımın alanlarını kesin olarak eşleştiriyoruz
     const stepFields: Record<number, Array<keyof PropertyFormInput>> = {
-      1: ["title", "description", "category", "status", "price"],
+      1: [
+        "title",
+        "description",
+        "category",
+        "status",
+        "price",
+        "area_gross",
+        "area_net",
+      ],
       2: ["city_id", "district_id", "neighborhood_id"],
       3: ["category_data"],
       4: ["images"],
@@ -165,7 +192,17 @@ export default function PropertyAddForm() {
       // We pass the data, uploaded links, and user ID
       // Verileri, yüklenen linkleri ve kullanıcı ID'sini gönderiyoruz
 
-      const result = await addPropertyAction(cleanValues, uploadedUrls);
+      let result;
+
+      if (initialData?.id) {
+        result = await updatePropertyAction(
+          initialData.id,
+          cleanValues,
+          uploadedUrls
+        );
+      } else {
+        result = await addPropertyAction(cleanValues, uploadedUrls);
+      }
 
       if (!result.success) {
         throw new Error(result.error);
