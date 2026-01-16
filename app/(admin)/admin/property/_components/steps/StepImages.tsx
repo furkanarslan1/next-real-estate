@@ -20,10 +20,17 @@ export interface ImageFile {
 
 interface StepImagesProps {
   form: UseFormReturn<PropertyFormInput>;
+  initialImages?: string[];
   onImagesChange: (images: ImageFile[]) => void;
+  onRemoveInitialImage?: (url: string) => void;
 }
 
-export function StepImages({ form, onImagesChange }: StepImagesProps) {
+export function StepImages({
+  form,
+  onImagesChange,
+  initialImages = [],
+  onRemoveInitialImage,
+}: StepImagesProps) {
   const [imageFiles, setImageFiles] = useState<ImageFile[]>([]);
   const [isCompressing, setIsCompressing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -144,7 +151,7 @@ export function StepImages({ form, onImagesChange }: StepImagesProps) {
       {/* ... UI Elements (Keep your existing drag & drop UI here) */}
       <FormItem>
         <FormLabel className="text-lg font-bold">
-          Property Photos ({imageFiles.length})
+          Property Photos ({initialImages.length + imageFiles.length})
         </FormLabel>
         <div
           onDragOver={(e) => {
@@ -189,6 +196,40 @@ export function StepImages({ form, onImagesChange }: StepImagesProps) {
 
       {/* Grid rendering remains same */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {/* SHOW OLD IMAGES */}
+        {initialImages.map((url, index) => (
+          <div
+            key={`initial-${index}`}
+            className="relative group aspect-square"
+          >
+            <img
+              src={url}
+              alt="Existing"
+              className="w-full h-full object-cover rounded-lg border group-hover:opacity-75 transition-opacity"
+            />
+
+            {/* KONTROL KATMANI: Mouse ile üzerine gelince görünür */}
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 rounded-lg">
+              {/* SİLME BUTONU */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation(); // Dropzone tıklamasını engelle
+                  onRemoveInitialImage?.(url);
+                }}
+                className="bg-destructive text-white p-2 rounded-full hover:scale-110 transition-transform shadow-lg"
+                title="Remove this image"
+              >
+                <X size={20} />
+              </button>
+
+              {/* BİLGİ ETİKETİ */}
+              <span className="text-white text-[10px] font-medium bg-black/50 px-2 py-0.5 rounded-full">
+                Existing Image
+              </span>
+            </div>
+          </div>
+        ))}
         {imageFiles.map((img, index) => (
           <div
             key={index}

@@ -3,17 +3,18 @@ import { notFound } from "next/navigation";
 import React from "react";
 import PropertyAddForm from "../../_components/PropertyAddForm";
 
-export default async function PropertyEditPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+interface EditPageProps {
+  params: Promise<{ id: string }>; // Params artık bir Promise!
+}
+
+export default async function EditPropertyPage({ params }: EditPageProps) {
+  const { id } = await params;
   const supabase = await createClient();
 
   const { data: property, error } = await supabase
     .from("properties")
     .select("*")
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (error || !property) {

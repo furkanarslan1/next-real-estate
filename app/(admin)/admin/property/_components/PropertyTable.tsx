@@ -28,6 +28,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { deleteProperty } from "@/app/(actions)/property/deleteProperty";
+import Link from "next/link";
 
 export interface Property {
   id: string;
@@ -173,8 +174,13 @@ export default function PropertyTable({ data }: PropertyTableProps) {
                     <DropdownMenuItem>
                       <ExternalLink className="mr-2 h-4 w-4" /> Preview
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Pencil className="mr-2 h-4 w-4" /> Edit
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href={`/admin/property/edit/${item.id}`}
+                        className="flex w-full items-center cursor-pointer"
+                      >
+                        <Pencil className="mr-2 h-4 w-4" /> Edit
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem

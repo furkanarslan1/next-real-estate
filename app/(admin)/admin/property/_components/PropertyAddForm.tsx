@@ -17,6 +17,7 @@ import { StepFeatures } from "./steps/StepFeatures";
 import { StepImages, ImageFile } from "./steps/StepImages";
 import { Loader2 } from "lucide-react";
 import { addPropertyAction } from "@/app/(actions)/property/addPropertyAction";
+import { updatePropertyAction } from "@/app/(actions)/property/editPropertyAction";
 
 interface PropertyAddFormProps {
   initialData?: PropertyValues & { id: string };
@@ -33,6 +34,10 @@ export default function PropertyAddForm({ initialData }: PropertyAddFormProps) {
   const step = Number(searchParams.get("step") ?? 1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [capturedFiles, setCapturedFiles] = useState<ImageFile[]>([]);
+
+  const [existingImages, setExistingImages] = useState<string[]>(
+    initialData?.images || []
+  );
 
   const form = useForm<PropertyFormInput>({
     resolver: zodResolver(propertySchema),
@@ -153,8 +158,13 @@ export default function PropertyAddForm({ initialData }: PropertyAddFormProps) {
       if (userError || !user)
         throw new Error("Session not found, please log in again.");
 
-      if (capturedFiles.length === 0)
+      const hasExistingImages =
+        initialData?.images && initialData.images.length > 0;
+      const hasNewImages = capturedFiles.length > 0;
+
+      if (!hasExistingImages && !hasNewImages) {
         throw new Error("Please upload at least one picture.");
+      }
 
       // 2. Parallel Upload with Promise.all / Promise.all ile Paralel Yükleme
       // We start all uploads at the same time / Tüm yüklemeleri aynı anda başlatıyoruz
@@ -187,6 +197,7 @@ export default function PropertyAddForm({ initialData }: PropertyAddFormProps) {
 
       // Wait for all uploads to complete / Tüm yüklemelerin bitmesini bekle
       const uploadedUrls = await Promise.all(uploadPromises);
+      const finalImageUrls = [...existingImages, ...uploadedUrls];
 
       // 3. CALL SERVER ACTION / Server Action'ı Çağır
       // We pass the data, uploaded links, and user ID
@@ -198,7 +209,7 @@ export default function PropertyAddForm({ initialData }: PropertyAddFormProps) {
         result = await updatePropertyAction(
           initialData.id,
           cleanValues,
-          uploadedUrls
+          finalImageUrls
         );
       } else {
         result = await addPropertyAction(cleanValues, uploadedUrls);
@@ -249,7 +260,16 @@ export default function PropertyAddForm({ initialData }: PropertyAddFormProps) {
           {step === 2 && <StepLocation form={form} />}
           {step === 3 && <StepFeatures form={form} />}
           {step === 4 && (
-            <StepImages form={form} onImagesChange={setCapturedFiles} />
+            <StepImages
+              form={form}
+              onImagesChange={setCapturedFiles}
+              initialImages={existingImages}
+              onRemoveInitialImage={(urlToRemove) => {
+                setExistingImages((prev) =>
+                  prev.filter((url) => url !== urlToRemove)
+                );
+              }}
+            />
           )}
 
           <div className="flex justify-between pt-6 border-t">
