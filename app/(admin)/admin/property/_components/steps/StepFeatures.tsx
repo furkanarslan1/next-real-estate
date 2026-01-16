@@ -19,6 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { PROPERTY_FEATURES } from "@/lib/constants/property-features";
+import { FeatureField } from "../FeatureField";
 
 type PropertyFormInput = z.input<typeof propertySchema>;
 
@@ -28,6 +30,7 @@ interface StepFeaturesProps {
 
 export function StepFeatures({ form }: StepFeaturesProps) {
   const category = form.watch("category");
+  const currentFeatures = PROPERTY_FEATURES[category] || [];
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -35,7 +38,7 @@ export function StepFeatures({ form }: StepFeaturesProps) {
         {category.replace("_", " ")} Details
       </h3>
 
-      {/* --- RESIDENTIAL (KONUT) FIELDS --- */}
+      {/* --- RESIDENTIAL (KONUT) FIELDS ---
       {(category === "konut" || category === "is_yeri") && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
@@ -135,7 +138,7 @@ export function StepFeatures({ form }: StepFeaturesProps) {
       )}
 
       {/* --- LAND (ARSA) FIELDS --- */}
-      {category === "arsa" && (
+      {/* {category === "arsa" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
             control={form.control}
@@ -180,6 +183,29 @@ export function StepFeatures({ form }: StepFeaturesProps) {
             )}
           />
         </div>
+      )}  */}
+
+      <div key={category} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {currentFeatures.map((feature) => (
+          <FormField
+            key={feature.id}
+            control={form.control}
+            // category_data altındaki ilgili ID'ye bağla
+            // Connect to the relevant ID under category data
+            name={`category_data.${feature.id}` as any}
+            render={({ field }) => (
+              <FeatureField feature={feature} field={field} />
+            )}
+          />
+        ))}
+      </div>
+
+      {/* Eğer seçilen kategoride hiç özellik tanımlanmamışsa kullanıcıya bilgi ver */}
+      {/* Inform the user if no properties are defined in the selected category */}
+      {currentFeatures.length === 0 && (
+        <p className="text-muted-foreground text-sm italic">
+          No additional features available for this category.
+        </p>
       )}
     </div>
   );

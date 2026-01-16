@@ -25,15 +25,25 @@ const EMPTY_CATEGORY_DATA = {
   room_count: "",
   building_age: "",
   floor_number: "",
-  heating: "",
-
+  total_floor: "",
+  heating: "natural gas",
   bathrooms: "",
   balconies: "",
-  in_site: false,
   zoning_status: "",
   ada: "",
   parsel: "",
-};
+
+  kitchen: "closed",
+  elevator: "yes",
+  parking: "no",
+  usage_status: "vacant",
+
+  maintenance_fee: 0,
+
+  furnished: false,
+  swap: false,
+  in_site: false,
+} as const;
 
 // Defining types from the schema
 // Şemadan tipleri tanımlıyoruz
@@ -174,28 +184,6 @@ export function StepBasicInfo({ form }: StepBasicInfoProps) {
                   value={(field.value as number | string) ?? ""}
                 />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="status"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Status</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="satilik">For Sale (Satılık)</SelectItem>
-                  <SelectItem value="kiralik">For Rent (Kiralık)</SelectItem>
-                </SelectContent>
-              </Select>
               <FormMessage />
             </FormItem>
           )}
