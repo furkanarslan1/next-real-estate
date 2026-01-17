@@ -6,17 +6,33 @@ import AdCategories from "./AdCategories";
 import PropertyCard, { PropertyCardData } from "../PropertyCard";
 import { Property } from "@/types/propertiesType";
 import { STATIC_CATEGORIES } from "@/lib/constants/categories";
+import SortFilter from "../SortFilter";
 
 export default async function AdsList({
   category,
   params,
   sort,
+  searchParams,
 }: {
   category: string;
   params: "home" | "adsList";
   sort?: string;
+  searchParams?: {
+    city?: string;
+    district?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    rooms?: string;
+    neighborhood?: string;
+  };
 }) {
   const supabase = await createClient();
+  const city = searchParams?.city;
+  const district = searchParams?.district;
+  const minPrice = searchParams?.minPrice;
+  const maxPrice = searchParams?.maxPrice;
+  const rooms = searchParams?.rooms;
+  const neighborhood = searchParams?.neighborhood;
 
   // CATEGORY FILTER
   let query = supabase
@@ -37,6 +53,13 @@ export default async function AdsList({
   if (category && category !== "all") {
     query = query.eq("category", category);
   }
+  if (city) query.eq("city_id", city);
+  if (district) query.eq("district_id", district);
+  if (minPrice) query.gte("price", minPrice);
+  if (maxPrice) query.lte("price", maxPrice);
+  if (neighborhood) query.eq("neighborhood_id", Number(neighborhood));
+
+  if (rooms) query.contains("category_data", { rooms: Number(rooms) });
   // SORT
   if (sort === "price-asc") {
     query = query.order("price", { ascending: true });
@@ -56,6 +79,7 @@ export default async function AdsList({
   return (
     <div className="max-w-7xl mx-auto py-10 px-4">
       <AdCategories categories={STATIC_CATEGORIES || []} />
+      <SortFilter />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10">
         {adsData && adsData.length > 0 ? (
