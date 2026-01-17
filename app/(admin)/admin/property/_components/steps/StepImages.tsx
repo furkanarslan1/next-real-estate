@@ -41,14 +41,26 @@ export function StepImages({
 
   // Security & Optimization Limits / Güvenlik ve Optimizasyon Limitleri
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB (Compression öncesi ham dosya limiti)
-  const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+  const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
   useEffect(() => {
-    form.setValue(
-      "images",
-      imageFiles.map((img) => img.file.name),
-      { shouldValidate: true }
-    );
+    // Eğer henüz bir kapak seçilmemişse VE resim varsa (eski veya yeni)
+    if (!coverImage) {
+      if (initialImages.length > 0) {
+        onSetCover(initialImages[0]);
+      } else if (imageFiles.length > 0) {
+        onSetCover(imageFiles[0].preview);
+      }
+    }
+  }, [imageFiles, initialImages, coverImage, onSetCover]);
+
+  useEffect(() => {
+    const allImages = [
+      ...initialImages,
+      ...imageFiles.map((img) => img.file.name),
+    ];
+
+    form.setValue("images", allImages, { shouldValidate: true });
     onImagesChange(imageFiles);
   }, [imageFiles, form, onImagesChange]);
 
@@ -116,9 +128,7 @@ export function StepImages({
         // if (!combined.some((img) => img.isCover) && combined.length > 0) {
         //   combined[0].isCover = true;
         // }
-        if (!coverImage && combined.length > 0) {
-          onSetCover(combined[0].preview);
-        }
+
         return combined;
       });
     } catch (error) {

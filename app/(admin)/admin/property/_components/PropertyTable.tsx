@@ -94,9 +94,9 @@ export default function PropertyTable({ data }: PropertyTableProps) {
         <TableRow>
           <TableHead className="w-20">Image</TableHead>
           <TableHead>Property Title</TableHead>
-          <TableHead className="hidden md:block">Category</TableHead>
-          <TableHead className="hidden md:block">Status</TableHead>
-          <TableHead className="hidden md:block">Price</TableHead>
+          <TableHead className="hidden md:table-cell">Category</TableHead>
+          <TableHead className="hidden md:table-cell">Status</TableHead>
+          <TableHead className="hidden md:table-cell">Price</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -128,13 +128,17 @@ export default function PropertyTable({ data }: PropertyTableProps) {
               </TableCell>
               <TableCell className="font-medium ">
                 <div className="flex flex-col">
-                  <span className="truncate max-w-50">{item.title}</span>
+                  <span className="truncate max-w-50 text-xs">
+                    {item.title.length > 10
+                      ? item.title.slice(0, 10) + "..."
+                      : item.title}
+                  </span>
                   <span className="text-[10px] text-muted-foreground font-mono italic">
                     #{item.id.split("-")[0]}
                   </span>
                 </div>
               </TableCell>
-              <TableCell className="hidden md:block">
+              <TableCell className="hidden md:table-cell">
                 <Badge variant="outline" className="capitalize font-normal">
                   {item.category === "is_yeri"
                     ? "Commercial"
@@ -143,7 +147,7 @@ export default function PropertyTable({ data }: PropertyTableProps) {
                     : item.category}
                 </Badge>
               </TableCell>
-              <TableCell className="hidden md:block">
+              <TableCell className="hidden md:table-cell">
                 <Badge
                   className={
                     item.status === "satilik"
@@ -155,7 +159,7 @@ export default function PropertyTable({ data }: PropertyTableProps) {
                   {item.status === "satilik" ? "FOR SALE" : "FOR RENT"}
                 </Badge>
               </TableCell>
-              <TableCell className="font-semibold hidden md:block">
+              <TableCell className="font-semibold hidden md:table-cell">
                 {new Intl.NumberFormat("tr-TR", {
                   style: "currency",
                   currency: "TRY",

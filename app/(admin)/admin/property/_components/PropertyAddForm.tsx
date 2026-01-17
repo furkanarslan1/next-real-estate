@@ -19,14 +19,14 @@ import { Loader2 } from "lucide-react";
 import { addPropertyAction } from "@/app/(actions)/property/addPropertyAction";
 import { updatePropertyAction } from "@/app/(actions)/property/editPropertyAction";
 
-interface PropertyAddFormProps {
-  initialData?: PropertyValues & { id: string };
-}
-
 // Use input for form initialization, infer for clean data
 // Form başlatma için 'input', temiz veri için 'infer' kullanıyoruz
 type PropertyFormInput = z.input<typeof propertySchema>;
 type PropertyValues = z.infer<typeof propertySchema>;
+
+interface PropertyAddFormProps {
+  initialData?: PropertyValues & { id: string };
+}
 
 export default function PropertyAddForm({ initialData }: PropertyAddFormProps) {
   const router = useRouter();
@@ -140,6 +140,7 @@ export default function PropertyAddForm({ initialData }: PropertyAddFormProps) {
     const validationResult = propertySchema.safeParse(values);
 
     if (!validationResult.success) {
+      console.log("Zod Validation Errors:", validationResult.error.format());
       toast.error("Please check the form for errors.");
       return;
     }
