@@ -85,7 +85,13 @@ export function StepLocation({ form }: StepLocationProps) {
       if (!error && data) {
         setDistricts(data as District[]);
         // Reset district and neighborhood in FORM
-        if (form.getValues("district_id") !== 0) {
+
+        const currentDistrictId = form.getValues("district_id");
+        const isCurrentDistrictInNewData = data.some(
+          (d) => d.id === currentDistrictId
+        );
+
+        if (!isCurrentDistrictInNewData && currentDistrictId) {
           form.setValue("district_id", 0);
           form.setValue("neighborhood_id", 0);
         }
@@ -110,7 +116,12 @@ export function StepLocation({ form }: StepLocationProps) {
 
       if (!error && data) {
         setNeighborhoods(data as Neighborhood[]);
-        if (form.getValues("neighborhood_id") !== 0) {
+        const currentNeighborhoodId = form.getValues("neighborhood_id");
+        const isCurrentNeighborhoodInNewData = data.some(
+          (n) => n.id === currentNeighborhoodId
+        );
+
+        if (!isCurrentNeighborhoodInNewData && currentNeighborhoodId !== 0) {
           form.setValue("neighborhood_id", 0);
         }
       }

@@ -23,6 +23,8 @@ interface StepImagesProps {
   initialImages?: string[];
   onImagesChange: (images: ImageFile[]) => void;
   onRemoveInitialImage?: (url: string) => void;
+  coverImage?: string;
+  onSetCover: (url: string) => void;
 }
 
 export function StepImages({
@@ -30,6 +32,8 @@ export function StepImages({
   onImagesChange,
   initialImages = [],
   onRemoveInitialImage,
+  coverImage,
+  onSetCover,
 }: StepImagesProps) {
   const [imageFiles, setImageFiles] = useState<ImageFile[]>([]);
   const [isCompressing, setIsCompressing] = useState(false);
@@ -109,8 +113,11 @@ export function StepImages({
       setImageFiles((prev) => {
         const combined = [...prev, ...newImages];
         // Ensure at least one image is cover / En az bir resmin kapak olduğundan emin ol
-        if (!combined.some((img) => img.isCover) && combined.length > 0) {
-          combined[0].isCover = true;
+        // if (!combined.some((img) => img.isCover) && combined.length > 0) {
+        //   combined[0].isCover = true;
+        // }
+        if (!coverImage && combined.length > 0) {
+          onSetCover(combined[0].preview);
         }
         return combined;
       });
@@ -197,77 +204,112 @@ export function StepImages({
       {/* Grid rendering remains same */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {/* SHOW OLD IMAGES */}
-        {initialImages.map((url, index) => (
-          <div
-            key={`initial-${index}`}
-            className="relative group aspect-square"
-          >
-            <img
-              src={url}
-              alt="Existing"
-              className="w-full h-full object-cover rounded-lg border group-hover:opacity-75 transition-opacity"
-            />
+        {/* SHOW OLD IMAGES (Eski Resimler) */}
+        {initialImages.map((url, index) => {
+          // Değişkeni burada tanımlamak için süslü parantez ve 'return' kullanmalıyız
+          const isCover = coverImage === url;
 
-            {/* KONTROL KATMANI: Mouse ile üzerine gelince görünür */}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 rounded-lg">
-              {/* SİLME BUTONU */}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation(); // Dropzone tıklamasını engelle
-                  onRemoveInitialImage?.(url);
-                }}
-                className="bg-destructive text-white p-2 rounded-full hover:scale-110 transition-transform shadow-lg"
-                title="Remove this image"
-              >
-                <X size={20} />
-              </button>
+          return (
+            <div
+              key={`initial-${index}`}
+              className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all ${
+                isCover ? "border-primary shadow-md" : "border-muted"
+              }`}
+            >
+              <img
+                src={url}
+                alt="Existing"
+                className="w-full h-full object-cover transition-opacity group-hover:opacity-75"
+              />
 
-              {/* BİLGİ ETİKETİ */}
-              <span className="text-white text-[10px] font-medium bg-black/50 px-2 py-0.5 rounded-full">
-                Existing Image
-              </span>
+              {/* Kontrol Katmanı */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
+                {/* Üst Kısım: Silme Butonu */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemoveInitialImage?.(url);
+                  }}
+                  className="self-end bg-destructive text-white p-1 rounded-full hover:scale-110 transition-transform"
+                >
+                  <X size={16} />
+                </button>
+
+                {/* Alt Kısım: Kapak Yap Butonu */}
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={isCover ? "default" : "secondary"}
+                  className="w-full text-[10px] h-7 font-bold shadow-sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSetCover(url);
+                  }}
+                >
+                  {isCover ? (
+                    <span className="flex items-center gap-1">
+                      <Star size={10} fill="currentColor" /> Main Photo
+                    </span>
+                  ) : (
+                    "Set as Main"
+                  )}
+                </Button>
+              </div>
             </div>
-          </div>
-        ))}
-        {imageFiles.map((img, index) => (
-          <div
-            key={index}
-            className={`relative aspect-square rounded-xl overflow-hidden border-2 ${
-              img.isCover ? "border-primary shadow-lg" : "border-transparent"
-            }`}
-          >
-            <img
-              src={img.preview}
-              alt=""
-              className="object-cover w-full h-full"
-            />
-            <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeImage(index);
-                }}
-                className="self-end bg-destructive text-white p-1 rounded-full"
-              >
-                <X size={14} />
-              </button>
-              <Button
-                type="button"
-                size="sm"
-                variant={img.isCover ? "default" : "secondary"}
-                className="w-full text-[10px] h-7"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setAsCover(index);
-                }}
-              >
-                {img.isCover ? "Main Photo" : "Set as Main"}
-              </Button>
+          );
+        })}
+
+        {/* SHOW NEW IMAGES (Yeni Resimler) */}
+        {imageFiles.map((img, index) => {
+          // Yeni resimler için de 'coverImage' state'ine bakıyoruz
+          const isCover = coverImage === img.preview;
+
+          return (
+            <div
+              key={`new-${index}`}
+              className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all ${
+                isCover ? "border-primary shadow-md" : "border-transparent"
+              }`}
+            >
+              <img
+                src={img.preview}
+                alt="New"
+                className="object-cover w-full h-full"
+              />
+              <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeImage(index);
+                  }}
+                  className="self-end bg-destructive text-white p-1 rounded-full"
+                >
+                  <X size={14} />
+                </button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={isCover ? "default" : "secondary"}
+                  className="w-full text-[10px] h-7 font-bold shadow-sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSetCover(img.preview); // Yeni resmin preview URL'ini kapak yap
+                  }}
+                >
+                  {isCover ? (
+                    <span className="flex items-center gap-1">
+                      <Star size={10} fill="currentColor" /> Main Photo
+                    </span>
+                  ) : (
+                    "Set as Main"
+                  )}
+                </Button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

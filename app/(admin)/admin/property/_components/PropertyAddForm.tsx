@@ -38,6 +38,9 @@ export default function PropertyAddForm({ initialData }: PropertyAddFormProps) {
   const [existingImages, setExistingImages] = useState<string[]>(
     initialData?.images || []
   );
+  const [coverImage, setCoverImage] = useState<string>(
+    initialData?.images?.[0] || ""
+  );
 
   const form = useForm<PropertyFormInput>({
     resolver: zodResolver(propertySchema),
@@ -197,11 +200,20 @@ export default function PropertyAddForm({ initialData }: PropertyAddFormProps) {
 
       // Wait for all uploads to complete / Tüm yüklemelerin bitmesini bekle
       const uploadedUrls = await Promise.all(uploadPromises);
-      const finalImageUrls = [...existingImages, ...uploadedUrls];
+      let finalImageUrls = [...existingImages, ...uploadedUrls];
 
       // 3. CALL SERVER ACTION / Server Action'ı Çağır
       // We pass the data, uploaded links, and user ID
       // Verileri, yüklenen linkleri ve kullanıcı ID'sini gönderiyoruz
+
+      if (coverImage) {
+        // Seçilen kapak resmini mevcut listeden bul ve en başa taşı
+        // Bu sayede veritabanına giden dizide images[0] her zaman seçilen kapak olur
+        finalImageUrls = [
+          coverImage,
+          ...finalImageUrls.filter((url) => url !== coverImage),
+        ];
+      }
 
       let result;
 
@@ -212,7 +224,7 @@ export default function PropertyAddForm({ initialData }: PropertyAddFormProps) {
           finalImageUrls
         );
       } else {
-        result = await addPropertyAction(cleanValues, uploadedUrls);
+        result = await addPropertyAction(cleanValues, finalImageUrls);
       }
 
       if (!result.success) {
@@ -264,10 +276,13 @@ export default function PropertyAddForm({ initialData }: PropertyAddFormProps) {
               form={form}
               onImagesChange={setCapturedFiles}
               initialImages={existingImages}
+              coverImage={coverImage} //
+              onSetCover={setCoverImage} //
               onRemoveInitialImage={(urlToRemove) => {
                 setExistingImages((prev) =>
                   prev.filter((url) => url !== urlToRemove)
                 );
+                if (coverImage === urlToRemove) setCoverImage("");
               }}
             />
           )}
