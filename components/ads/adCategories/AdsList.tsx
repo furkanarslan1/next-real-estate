@@ -8,6 +8,8 @@ import { Property } from "@/types/propertiesType";
 import { STATIC_CATEGORIES } from "@/lib/constants/categories";
 import SortFilter from "../SortFilter";
 
+const ITEMS_PER_PAGE = 12;
+
 export default async function AdsList({
   category,
   params,
@@ -24,42 +26,49 @@ export default async function AdsList({
     maxPrice?: string;
     rooms?: string;
     neighborhood?: string;
+    page?: string;
   };
 }) {
   const supabase = await createClient();
   const city = searchParams?.city;
   const district = searchParams?.district;
-  const minPrice = searchParams?.minPrice;
-  const maxPrice = searchParams?.maxPrice;
-  const rooms = searchParams?.rooms;
+  const minPrice = searchParams?.minPrice
+    ? Number(searchParams.minPrice)
+    : null;
+  const maxPrice = searchParams?.maxPrice
+    ? Number(searchParams.maxPrice)
+    : null;
+  const rooms = searchParams?.rooms ? Number(searchParams.rooms) : null;
   const neighborhood = searchParams?.neighborhood;
+  const currentPage = searchParams?.page ? Number(searchParams.page) : 1;
 
   // CATEGORY FILTER
   let query = supabase
     .from("properties")
     .select(
       `
-    id, 
-    title, 
-    price, 
-    category, 
-    status,
-    images, 
-    category_data, 
-    area_gross
-  `
+      id, 
+      title, 
+      price, 
+      category, 
+      status,
+      images, 
+      category_data, 
+      area_gross
+    `,
+      { count: "exact" }
     )
     .eq("is_active", true);
   if (category && category !== "all") {
     query = query.eq("category", category);
   }
+  if (category && category !== "all") query = query.eq("category", category);
   if (city) query.eq("city_id", city);
   if (district) query.eq("district_id", district);
   if (minPrice) query.gte("price", minPrice);
   if (maxPrice) query.lte("price", maxPrice);
   if (neighborhood) query.eq("neighborhood_id", Number(neighborhood));
-
-  if (rooms) query.contains("category_data", { rooms: Number(rooms) });
+  if (rooms) query.contains("category_data", { rooms: rooms });
   // SORT
   if (sort === "price-asc") {
     query = query.order("price", { ascending: true });
@@ -71,16 +80,37 @@ export default async function AdsList({
 
   //LIMIT
   if (params === "home") {
-    query = query.limit(5);
+    query = query.limit(8);
+  } else {
+    const from = (currentPage - 1) * ITEMS_PER_PAGE;
+    const to = from + ITEMS_PER_PAGE - 1;
+    query = query.range(from, to);
   }
 
-  const { data: adsData, error } = await query;
+  const { data: adsData, error, count } = await query;
+
+  if (error) {
+    console.error("Supabase Error:", error.message);
+    return (
+      <div className="text-center py-20">
+        <p className="text-red-500 font-semibold">
+          An error occurred while loading the ads.
+        </p>
+        <p className="text-sm text-gray-400">Please refresh the page.</p>
+      </div>
+    );
+  }
+
+  const totalPages = count ? Math.ceil(count / ITEMS_PER_PAGE) : 0;
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-4">
       <AdCategories categories={STATIC_CATEGORIES || []} />
       <SortFilter />
-
+      <p className="text-sm text-muted-foreground mt-4">
+        Total <span className="font-bold text-foreground">{count || 0}</span>{" "}
+        ads founded.
+      </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10">
         {adsData && adsData.length > 0 ? (
           adsData.map((ad: PropertyCardData) => (

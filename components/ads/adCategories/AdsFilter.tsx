@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 type City = { id: number; name: string };
 type District = { id: number; name: string; city_id: number };
@@ -14,136 +15,211 @@ export default function AdsFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // selected values (URL’den başlatılır)
+  // --- States ---
   const [city, setCity] = useState(searchParams.get("city") || "");
   const [district, setDistrict] = useState(searchParams.get("district") || "");
   const [neighborhood, setNeighborhood] = useState(
     searchParams.get("neighborhood") || ""
   );
-
   const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
   const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
 
-  // data lists
   const [cities, setCities] = useState<City[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
   const [neighborhoods, setNeighborhoods] = useState<Neighborhood[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Load cities once
+  // --- URL Değiştiğinde State'leri Güncelle (Geri/İleri butonu için) ---
+  // --- Update States When URL Changes (For Back/Next Button) ---
   useEffect(() => {
-    supabase
-      .from("cities")
-      .select("id,name")
-      .then(({ data }) => {
-        if (data) setCities(data);
-      });
-  }, []);
+    setCity(searchParams.get("city") || "");
+    setDistrict(searchParams.get("district") || "");
+    setNeighborhood(searchParams.get("neighborhood") || "");
+    setMinPrice(searchParams.get("minPrice") || "");
+    setMaxPrice(searchParams.get("maxPrice") || "");
+  }, [searchParams]);
 
-  // Load districts when city changes
+  // --- Data Fetching ---
+
   useEffect(() => {
-    if (!city) return;
-    supabase
-      .from("districts")
-      .select("id,name,city_id")
-      .eq("city_id", city)
-      .then(({ data }) => {
-        if (data) setDistricts(data);
-      });
-  }, [city]);
+    const fetchCities = async () => {
+      const { data } = await supabase
+        .from("cities")
+        .select("id,name")
+        .order("name");
+      if (data) setCities(data);
+    };
+    fetchCities();
+  }, [supabase]);
 
-  // Load neighborhoods when district changes
   useEffect(() => {
-    if (!district) return;
-    supabase
-      .from("neighborhoods")
-      .select("id,name,county_id")
-      .eq("county_id", district)
-      .then(({ data }) => {
-        if (data) setNeighborhoods(data);
-      });
-  }, [district]);
+    if (!city) {
+      setDistricts([]);
+      return;
+    }
 
-  function applyFilter() {
-    const params = new URLSearchParams();
+    const fetchDistricts = async () => {
+      setIsLoading(true);
+      const { data } = await supabase
+        .from("districts")
+        .select("id,name,city_id")
+        .eq("city_id", city)
+        .order("name");
+      if (data) setDistricts(data);
+      setIsLoading(false);
+    };
+    fetchDistricts();
+  }, [city, supabase]);
+
+  useEffect(() => {
+    if (!district) {
+      setNeighborhoods([]);
+      return;
+    }
+
+    const fetchNeighborhoods = async () => {
+      const { data } = await supabase
+        .from("neighborhoods")
+        .select("id,name,county_id")
+        .eq("county_id", district)
+        .order("name");
+      if (data) setNeighborhoods(data);
+    };
+    fetchNeighborhoods();
+  }, [district, supabase]);
+
+  // --- Handlers ---
+  const applyFilter = useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    // Sayfalamayı sıfırla (Filtre değişince 1. sayfaya dönmeli)
+    // Reset pagination (Should return to page 1 when filter changes)
+    params.delete("page");
 
     if (city) params.set("city", city);
+    else params.delete("city");
     if (district) params.set("district", district);
+    else params.delete("district");
     if (neighborhood) params.set("neighborhood", neighborhood);
+    else params.delete("neighborhood");
     if (minPrice) params.set("minPrice", minPrice);
+    else params.delete("minPrice");
     if (maxPrice) params.set("maxPrice", maxPrice);
+    else params.delete("maxPrice");
 
     router.push(`/ads?${params.toString()}`);
-  }
+  }, [city, district, neighborhood, minPrice, maxPrice, router, searchParams]);
+
+  const resetFilters = () => {
+    setCity("");
+    setDistrict("");
+    setNeighborhood("");
+    setMinPrice("");
+    setMaxPrice("");
+    router.push("/ads");
+  };
 
   return (
-    <div className="bg-white p-4 rounded-xl shadow-sm flex flex-wrap gap-3">
-      {/* City */}
-      <select
-        value={city}
-        onChange={(e) => {
-          setCity(e.target.value);
-          setDistrict("");
-          setNeighborhood("");
-        }}
-        className="border rounded px-3 py-2"
-      >
-        <option value="">Şehir</option>
-        {cities.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.name}
-          </option>
-        ))}
-      </select>
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-wrap items-end gap-4">
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-semibold text-gray-500 ml-1">City</label>
+        <select
+          value={city}
+          onChange={(e) => {
+            setCity(e.target.value);
+            setDistrict("");
+            setNeighborhood("");
+          }}
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 outline-none min-w-35"
+        >
+          <option value="">All</option>
+          {cities.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      {/* District */}
-      <select
-        value={district}
-        onChange={(e) => {
-          setDistrict(e.target.value);
-          setNeighborhood("");
-        }}
-        className="border rounded px-3 py-2"
-        disabled={!city}
-      >
-        <option value="">İlçe</option>
-        {districts.map((d) => (
-          <option key={d.id} value={d.id}>
-            {d.name}
-          </option>
-        ))}
-      </select>
+      {/* İlçe Seçimi */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-semibold text-gray-500 ml-1">
+          Discrict
+        </label>
+        <select
+          value={district}
+          onChange={(e) => {
+            setDistrict(e.target.value);
+            setNeighborhood("");
+          }}
+          disabled={!city || isLoading}
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 outline-none min-w-35 disabled:bg-gray-50"
+        >
+          <option value="">All</option>
+          {districts.map((d) => (
+            <option key={d.id} value={d.id}>
+              {d.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      {/* Neighborhood */}
-      <select
-        value={neighborhood}
-        onChange={(e) => setNeighborhood(e.target.value)}
-        className="border rounded px-3 py-2"
-        disabled={!district}
-      >
-        <option value="">Mahalle</option>
-        {neighborhoods.map((n) => (
-          <option key={n.id} value={n.id}>
-            {n.name}
-          </option>
-        ))}
-      </select>
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-semibold text-gray-500 ml-1">
+          Neighborhood
+        </label>
+        <select
+          value={neighborhood}
+          onChange={(e) => setNeighborhood(e.target.value)}
+          disabled={!district}
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 outline-none min-w-35 disabled:bg-gray-50"
+        >
+          <option value="">All</option>
+          {neighborhoods.map((n) => (
+            <option key={n.id} value={n.id}>
+              {n.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      {/* Price */}
-      <input
-        placeholder="Min ₺"
-        value={minPrice}
-        onChange={(e) => setMinPrice(e.target.value)}
-        className="border rounded px-3 py-2 w-28"
-      />
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-semibold text-gray-500 ml-1">
+          Price ($)
+        </label>
+        <div className="flex items-center gap-2">
+          <input
+            placeholder="Min"
+            type="number"
+            value={minPrice}
+            onChange={(e) => setMinPrice(e.target.value)}
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-24 focus:ring-2 focus:ring-orange-500 outline-none"
+          />
+          <input
+            placeholder="Max"
+            type="number"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm w-24 focus:ring-2 focus:ring-orange-500 outline-none"
+          />
+        </div>
+      </div>
 
-      <input
-        placeholder="Max ₺"
-        value={maxPrice}
-        onChange={(e) => setMaxPrice(e.target.value)}
-        className="border rounded px-3 py-2 w-28"
-      />
-
-      <Button onClick={applyFilter}>Filtrele</Button>
+      <div className="flex gap-2 ml-auto">
+        <Button
+          variant="ghost"
+          onClick={resetFilters}
+          className="text-gray-500 text-sm"
+        >
+          Clean
+        </Button>
+        <Button
+          onClick={applyFilter}
+          className="bg-orange-600 hover:bg-orange-700 text-white px-8 rounded-lg shadow-md transition-all active:scale-95"
+        >
+          Filter
+        </Button>
+      </div>
     </div>
   );
 }
