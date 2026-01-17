@@ -11,7 +11,7 @@ export default async function MainLayout({
   return (
     <>
       {/* <header className="absolute top-0 left-0 w-full z-30"> */}
-      <header>
+      <header className="absolute top-0 left-0 w-full z-30">
         {/* <Header user={user} /> */}
         <Header />
       </header>

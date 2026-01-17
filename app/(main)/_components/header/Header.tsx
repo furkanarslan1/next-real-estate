@@ -23,20 +23,25 @@ export default function Header() {
         <h1 className="font-semibold text-md">NextReal Estate</h1>
       </section>
 
-      <section className="flex items-center gap-4">
+      <section className="hidden md:flex items-center gap-4 ">
         {navLinks.map((nav) => (
           <Link
             key={nav.href}
             href={nav.href}
-            className={`border-b-2 border-transparent hover:border-white transition-all duration-300 ${
-              pathname === nav.href ? "border-b-2 border-white" : ""
-            }`}
+            className="relative font-light text-white group"
           >
             {nav.name}
+
+            {/* Animasyonlu Alt Çizgi */}
+            <span
+              className={`absolute left-0 -bottom-1 h-0.5bg-white transition-all duration-300 ease-out 
+    ${pathname === nav.href ? "w-full" : "w-0 group-hover:w-full group-hover:left-0"} 
+    origin-center`}
+            ></span>
           </Link>
         ))}
       </section>
-      <section>
+      <section className="hidden md:block">
         <div className="flex gap-4">
           <Link
             href="/facebook"
