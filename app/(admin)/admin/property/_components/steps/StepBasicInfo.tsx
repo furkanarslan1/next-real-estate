@@ -90,6 +90,7 @@ export function StepBasicInfo({ form }: StepBasicInfoProps) {
             <FormLabel>Listing Title</FormLabel>
             <FormControl>
               <Input
+                id="property-title-input"
                 placeholder="e.g. Luxury Apartment in City Center"
                 {...field}
               />

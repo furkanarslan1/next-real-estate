@@ -94,9 +94,9 @@ export default function PropertyTable({ data }: PropertyTableProps) {
         <TableRow>
           <TableHead className="w-20">Image</TableHead>
           <TableHead>Property Title</TableHead>
-          <TableHead>Category</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Price</TableHead>
+          <TableHead className="hidden md:block">Category</TableHead>
+          <TableHead className="hidden md:block">Status</TableHead>
+          <TableHead className="hidden md:block">Price</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -126,7 +126,7 @@ export default function PropertyTable({ data }: PropertyTableProps) {
                   </div>
                 )}
               </TableCell>
-              <TableCell className="font-medium">
+              <TableCell className="font-medium ">
                 <div className="flex flex-col">
                   <span className="truncate max-w-50">{item.title}</span>
                   <span className="text-[10px] text-muted-foreground font-mono italic">
@@ -134,7 +134,7 @@ export default function PropertyTable({ data }: PropertyTableProps) {
                   </span>
                 </div>
               </TableCell>
-              <TableCell>
+              <TableCell className="hidden md:block">
                 <Badge variant="outline" className="capitalize font-normal">
                   {item.category === "is_yeri"
                     ? "Commercial"
@@ -143,7 +143,7 @@ export default function PropertyTable({ data }: PropertyTableProps) {
                     : item.category}
                 </Badge>
               </TableCell>
-              <TableCell>
+              <TableCell className="hidden md:block">
                 <Badge
                   className={
                     item.status === "satilik"
@@ -155,7 +155,7 @@ export default function PropertyTable({ data }: PropertyTableProps) {
                   {item.status === "satilik" ? "FOR SALE" : "FOR RENT"}
                 </Badge>
               </TableCell>
-              <TableCell className="font-semibold">
+              <TableCell className="font-semibold hidden md:block">
                 {new Intl.NumberFormat("tr-TR", {
                   style: "currency",
                   currency: "TRY",

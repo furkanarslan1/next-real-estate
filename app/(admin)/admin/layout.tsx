@@ -1,4 +1,7 @@
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import React from "react";
+import AdminSideBar from "./_components/AdminSidebar";
+import AdminNavbar from "./_components/AdminNavbar";
 
 export default async function AdminLayout({
   children,
@@ -8,12 +11,13 @@ export default async function AdminLayout({
   //     data: { user },
   //   } = await supabase.auth.getUser();
   return (
-    <>
-      <header className="absolute top-0 left-0 w-full z-30">
-        {/* <Header user={user} /> */}
-      </header>
-      <main className="min-h-screen ">{children}</main>
-      {/* <Footer /> */}
-    </>
+    <SidebarProvider>
+      <AdminSideBar />
+
+      <SidebarInset>
+        <AdminNavbar />
+        <div className="px-4">{children}</div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
