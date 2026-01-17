@@ -9,6 +9,8 @@ export interface Property {
   city_id: number;
   district_id: number;
   neighborhood_id: number;
+  area_gross: number;
+  area_net?: number;
   category_data: {
     room_count?: string;
     building_age?: string;

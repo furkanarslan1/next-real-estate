@@ -3,6 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import React from "react";
 import AdCategories from "./AdCategories";
+import PropertyCard, { PropertyCardData } from "../PropertyCard";
+import { Property } from "@/types/propertiesType";
+import { STATIC_CATEGORIES } from "@/lib/constants/categories";
 
 export default async function AdsList({
   category,
@@ -15,15 +18,21 @@ export default async function AdsList({
 }) {
   const supabase = await createClient();
 
-  // CATEGORY
-  const { data: categoriesData } = await supabase
-    .from("categories")
-    .select("id,name,slug");
-
   // CATEGORY FILTER
   let query = supabase
     .from("properties")
-    .select("id, title, price, category, images, category_data")
+    .select(
+      `
+    id, 
+    title, 
+    price, 
+    category, 
+    status,
+    images, 
+    category_data, 
+    area_gross
+  `
+    )
     .eq("is_active", true);
   if (category && category !== "all") {
     query = query.eq("category", category);
@@ -46,13 +55,13 @@ export default async function AdsList({
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-4">
-      {/* Kategori Barı */}
-      <AdCategories categories={categoriesData || []} />
+      <AdCategories categories={STATIC_CATEGORIES || []} />
 
-      {/* İlan Listesi Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10">
         {adsData && adsData.length > 0 ? (
-          adsData.map((ad) => <PropertyCard key={ad.id} property={ad} />)
+          adsData.map((ad: PropertyCardData) => (
+            <PropertyCard key={ad.id} property={ad} />
+          ))
         ) : (
           <div className="col-span-full text-center py-20 border-2 border-dashed rounded-3xl">
             <p className="text-muted-foreground italic">
@@ -62,7 +71,6 @@ export default async function AdsList({
         )}
       </div>
 
-      {/* Alt Buton: Sadece Ana Sayfadaysak */}
       {params === "home" && (
         <div className="mt-12 text-center">
           <Button
