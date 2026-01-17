@@ -4,7 +4,17 @@ import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 
-export default function AdCategories({ categories }: CategoriesProps) {
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+interface AdCategoriesProps {
+  categories: Category[];
+}
+
+export default function AdCategories({ categories }: AdCategoriesProps) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
