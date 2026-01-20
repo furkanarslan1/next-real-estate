@@ -7,6 +7,7 @@ import SortFilter from "@/components/ads/SortFilter";
 import AdCategories from "@/components/ads/adCategories/AdCategories";
 import { STATIC_CATEGORIES } from "@/lib/constants/categories";
 import AdsFilter from "@/components/ads/adCategories/AdsFilter";
+import BannerFamily from "./_components/banner/BannerFamily";
 
 export default async function Home({
   searchParams,
@@ -30,6 +31,7 @@ export default async function Home({
       <Suspense key={suspenseKey} fallback={<AdsListSkeleton />}>
         <AdsList sort={sort} selectedCategory={category} params="home" />
       </Suspense>
+      <BannerFamily />
     </div>
   );
 }
