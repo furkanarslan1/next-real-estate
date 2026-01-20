@@ -1,25 +1,31 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+  useTransition,
+} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 type City = { id: number; name: string };
 type District = { id: number; name: string; city_id: number };
 type Neighborhood = { id: number; name: string; county_id: number };
 
 export default function AdsFilter() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
   // --- States ---
   const [city, setCity] = useState(searchParams.get("city") || "");
   const [district, setDistrict] = useState(searchParams.get("district") || "");
   const [neighborhood, setNeighborhood] = useState(
-    searchParams.get("neighborhood") || ""
+    searchParams.get("neighborhood") || "",
   );
   const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
   const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
@@ -58,17 +64,24 @@ export default function AdsFilter() {
       return;
     }
 
+    let cancelled = false;
+
     const fetchDistricts = async () => {
       setIsLoading(true);
       const { data } = await supabase
         .from("districts")
         .select("id,name,city_id")
-        .eq("city_id", city)
+        .eq("city_id", Number(city))
         .order("name");
-      if (data) setDistricts(data);
+      if (!cancelled && data) {
+        setDistricts(data);
+      }
       setIsLoading(false);
     };
     fetchDistricts();
+    return () => {
+      cancelled = true;
+    };
   }, [city, supabase]);
 
   useEffect(() => {
@@ -77,15 +90,25 @@ export default function AdsFilter() {
       return;
     }
 
+    let cancelled = false;
+
     const fetchNeighborhoods = async () => {
       const { data } = await supabase
         .from("neighborhoods")
         .select("id,name,county_id")
-        .eq("county_id", district)
+        .eq("county_id", Number(district))
         .order("name");
-      if (data) setNeighborhoods(data);
+
+      if (!cancelled && data) {
+        setNeighborhoods(data);
+      }
     };
+
     fetchNeighborhoods();
+
+    return () => {
+      cancelled = true;
+    };
   }, [district, supabase]);
 
   // --- Handlers ---
@@ -107,7 +130,14 @@ export default function AdsFilter() {
     if (maxPrice) params.set("maxPrice", maxPrice);
     else params.delete("maxPrice");
 
-    router.push(`/ads?${params.toString()}`);
+    const nextUrl = `/ads?${params.toString()}`;
+    const currentUrl = window.location.pathname + window.location.search;
+
+    if (nextUrl !== currentUrl) {
+      startTransition(() => {
+        router.push(nextUrl);
+      });
+    }
   }, [city, district, neighborhood, minPrice, maxPrice, router, searchParams]);
 
   const resetFilters = () => {
@@ -116,7 +146,9 @@ export default function AdsFilter() {
     setNeighborhood("");
     setMinPrice("");
     setMaxPrice("");
-    router.push("/ads");
+    startTransition(() => {
+      router.push("/ads");
+    });
   };
 
   return (
@@ -215,9 +247,10 @@ export default function AdsFilter() {
         </Button>
         <Button
           onClick={applyFilter}
+          disabled={isPending}
           className="bg-orange-600 hover:bg-orange-700 text-white px-8 rounded-lg shadow-md transition-all active:scale-95"
         >
-          Filter
+          {isPending ? "Filtering.." : "Filter"}
         </Button>
       </div>
     </div>
