@@ -2,21 +2,18 @@ import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import React from "react";
-import AdCategories from "./AdCategories";
+
 import PropertyCard, { PropertyCardData } from "../PropertyCard";
-import { Property } from "@/types/propertiesType";
-import { STATIC_CATEGORIES } from "@/lib/constants/categories";
-import SortFilter from "../SortFilter";
 
 const ITEMS_PER_PAGE = 12;
 
 export default async function AdsList({
-  category,
+  selectedCategory,
   params,
   sort,
   searchParams,
 }: {
-  category: string;
+  selectedCategory: string;
   params: "home" | "adsList";
   sort?: string;
   searchParams?: {
@@ -56,13 +53,13 @@ export default async function AdsList({
       category_data, 
       area_gross
     `,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("is_active", true);
-  if (category && category !== "all") {
-    query = query.eq("category", category);
+  if (selectedCategory && selectedCategory !== "all") {
+    query = query.eq("category", selectedCategory);
   }
-  if (category && category !== "all") query = query.eq("category", category);
+
   if (city) query.eq("city_id", city);
   if (district) query.eq("district_id", district);
   if (minPrice) query.gte("price", minPrice);

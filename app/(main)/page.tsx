@@ -10,11 +10,12 @@ import { STATIC_CATEGORIES } from "@/lib/constants/categories";
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; sort?: string }>;
 }) {
   const params = await searchParams;
   const category = params.category || "all";
   const suspenseKey = JSON.stringify(params);
+  const sort = params.sort;
 
   return (
     <div>
@@ -25,7 +26,7 @@ export default async function Home({
       </div>
 
       <Suspense key={suspenseKey} fallback={<AdsListSkeleton />}>
-        <AdsList category={category} key={category} params="home" />
+        <AdsList sort={sort} selectedCategory={category} params="home" />
       </Suspense>
     </div>
   );

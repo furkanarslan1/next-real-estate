@@ -9,17 +9,19 @@ import { Suspense } from "react";
 export default async function AdsPage({
   searchParams,
 }: {
-  searchParams: {
+  searchParams: Promise<{
     city?: string;
     district?: string;
     minPrice?: string;
     maxPrice?: string;
     rooms?: string;
     sort?: string;
-  };
+    category?: string;
+  }>;
 }) {
   const params = await searchParams;
   const suspenseKey = JSON.stringify(params);
+  const category = params.category || "all";
   return (
     <div className=" ">
       <div className="h-16 bg-black"></div>
@@ -29,7 +31,7 @@ export default async function AdsPage({
         <SortFilter />
         <Suspense key={suspenseKey} fallback={<AdsListSkeleton />}>
           <AdsList
-            category="all"
+            selectedCategory={category}
             params="adsList"
             sort={params.sort}
             searchParams={params}
