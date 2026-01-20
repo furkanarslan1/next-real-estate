@@ -101,7 +101,7 @@ export default async function AdsList({
   const totalPages = count ? Math.ceil(count / ITEMS_PER_PAGE) : 0;
 
   return (
-    <div className="max-w-7xl mx-auto py-1px-4">
+    <div className="max-w-7xl mx-auto py-1 px-4">
       <p className="text-sm text-muted-foreground mt-4">
         Total <span className="font-bold text-foreground">{count || 0}</span>{" "}
         ads founded.

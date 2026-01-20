@@ -6,6 +6,7 @@ import { AdsListSkeleton } from "@/components/ads/PropertyCardSkeleton";
 import SortFilter from "@/components/ads/SortFilter";
 import AdCategories from "@/components/ads/adCategories/AdCategories";
 import { STATIC_CATEGORIES } from "@/lib/constants/categories";
+import AdsFilter from "@/components/ads/adCategories/AdsFilter";
 
 export default async function Home({
   searchParams,
@@ -18,9 +19,10 @@ export default async function Home({
   const sort = params.sort;
 
   return (
-    <div>
+    <div className="space-y-6">
       <Hero />
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto px-4 space-y-4">
+        <AdsFilter />
         <AdCategories categories={STATIC_CATEGORIES || []} />
         <SortFilter />
       </div>

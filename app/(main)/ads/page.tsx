@@ -23,9 +23,9 @@ export default async function AdsPage({
   const suspenseKey = JSON.stringify(params);
   const category = params.category || "all";
   return (
-    <div className=" ">
+    <div className=" space-y-8">
       <div className="h-16 bg-black"></div>
-      <div className="max-w-7xl mx-auto ">
+      <div className="max-w-7xl mx-auto px-4  space-y-4">
         <AdsFilter />
         <AdCategories categories={STATIC_CATEGORIES || []} />
         <SortFilter />
