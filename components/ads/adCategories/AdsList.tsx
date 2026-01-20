@@ -4,6 +4,7 @@ import Link from "next/link";
 import React from "react";
 
 import PropertyCard, { PropertyCardData } from "../PropertyCard";
+import Pagination from "@/components/pagination/Pagination";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -130,6 +131,9 @@ export default async function AdsList({
             <Link href="/ads">View All Listings</Link>
           </Button>
         </div>
+      )}
+      {params === "adsList" && totalPages > 1 && (
+        <Pagination totalPages={totalPages} />
       )}
     </div>
   );

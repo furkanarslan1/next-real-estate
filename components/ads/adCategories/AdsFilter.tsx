@@ -131,7 +131,7 @@ export default function AdsFilter() {
     else params.delete("maxPrice");
 
     const nextUrl = `/ads?${params.toString()}`;
-    const currentUrl = window.location.pathname + window.location.search;
+    const currentUrl = `/ads?${searchParams.toString()}`;
 
     if (nextUrl !== currentUrl) {
       startTransition(() => {
