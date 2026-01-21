@@ -7,6 +7,7 @@ import PropertyGallery from "./_components/galery/PropertyGallery";
 import PropertyFeatures from "./_components/PropertyFeatures";
 import PropertyDescription from "./_components/PropertyDescription";
 import PropertyAgentCard from "./_components/PropertyAgentCard";
+import SimilarProperties from "./_components/SimilarProperties";
 
 export default async function PropertyDetailPage({
   params,
@@ -30,12 +31,32 @@ export default async function PropertyDetailPage({
 
     .eq("id", actualId)
     .single();
+  const typedProperty = property as Property;
+
+  const { data: similarProperties } = await supabase
+    .from("properties")
+    .select(
+      `
+    id, 
+    title, 
+    price, 
+    images, 
+    status, 
+    category, 
+    area_gross, 
+    category_data,
+    cities:city_id(name),
+    districts:district_id(name)
+  `,
+    )
+    .eq("category", typedProperty.category)
+    .eq("city_id", typedProperty.city_id)
+    .neq("id", actualId)
+    .limit(4);
 
   if (error || !property) {
     notFound();
   }
-
-  const typedProperty = property as Property;
 
   return (
     <div>
@@ -55,13 +76,14 @@ export default async function PropertyDetailPage({
             <PropertyDescription description={typedProperty.description} />
           </div>
 
-          {/* RIGHT SİDE TARAF: Sticky ASSISTANT CARD (%33) -  */}
+          {/* RIGHT SİDE : Sticky ASSISTANT CARD (%33) -  */}
           <div className="lg:col-span-1">
             <div className="sticky top-24">
               <PropertyAgentCard price={typedProperty.price} />
             </div>
           </div>
         </div>
+        <SimilarProperties properties={similarProperties || []} />
       </div>
     </div>
   );
