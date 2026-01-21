@@ -24,7 +24,7 @@ export default async function AdsPage({
   const category = params.category || "all";
   return (
     <div className=" space-y-8">
-      <div className="h-16 bg-black"></div>
+      <div className="h-16 bg-linear-to-bl from-slate-950 to-slate-700"></div>
       <div className="max-w-7xl mx-auto px-4  space-y-4">
         <PropertiesFilter />
         <PropertiesCategories categories={STATIC_CATEGORIES || []} />
