@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import React from "react";
 import PropertyHeader from "./_components/PropertyHeader";
 import PropertyGallery from "./_components/galery/PropertyGallery";
+import PropertyFeatures from "./_components/PropertyFeatures";
+import PropertyDescription from "./_components/PropertyDescription";
 
 export default async function PropertyDetailPage({
   params,
@@ -40,6 +42,25 @@ export default async function PropertyDetailPage({
       <div className="max-w-7xl mx-auto px-4 py-10 overflow-hidden">
         <PropertyHeader property={typedProperty} />
         <PropertyGallery images={typedProperty.images ?? []} />
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mt-12">
+          {/* LEFT SIDE: DESCRIPTION AND FEATURES (%66) */}
+          <div className="lg:col-span-2 space-y-12">
+            <PropertyFeatures
+              categoryData={typedProperty.category_data}
+              areaGross={typedProperty.area_gross}
+            />
+            <hr className="border-slate-100" />
+            <PropertyDescription description={typedProperty.description} />
+          </div>
+
+          {/* RIGHT SİDE TARAF: Sticky ASSISTANT CARD (%33) -  */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24">
+              {/* <PropertyAgentCard user={typedProperty.user} /> */}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
