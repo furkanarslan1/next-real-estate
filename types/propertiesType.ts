@@ -9,6 +9,9 @@ export interface Property {
   city_id: number;
   district_id: number;
   neighborhood_id: number;
+  cities?: { name: string };
+  districts?: { name: string };
+  // neighborhoods?: { name: string };
   area_gross: number;
   area_net?: number;
   category_data: {
