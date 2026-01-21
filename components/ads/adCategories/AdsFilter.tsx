@@ -10,6 +10,8 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { filterSchema } from "@/schemas/filterSchema";
 
 type City = { id: number; name: string };
 type District = { id: number; name: string; city_id: number };
@@ -17,6 +19,7 @@ type Neighborhood = { id: number; name: string; county_id: number };
 
 export default function AdsFilter() {
   const supabase = useMemo(() => createClient(), []);
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -33,7 +36,11 @@ export default function AdsFilter() {
   const [cities, setCities] = useState<City[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
   const [neighborhoods, setNeighborhoods] = useState<Neighborhood[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState({
+    cities: false,
+    districts: false,
+    neighborhoods: false,
+  });
 
   // --- URL Değiştiğinde State'leri Güncelle (Geri/İleri butonu için) ---
   // --- Update States When URL Changes (For Back/Next Button) ---
@@ -49,11 +56,17 @@ export default function AdsFilter() {
 
   useEffect(() => {
     const fetchCities = async () => {
-      const { data } = await supabase
+      setIsLoading((prev) => ({ ...prev, cities: true }));
+      const { data, error } = await supabase
         .from("cities")
         .select("id,name")
         .order("name");
-      if (data) setCities(data);
+      if (error) {
+        toast.error("Cities cannot load");
+      } else {
+        setCities(data || []);
+      }
+      setIsLoading((prev) => ({ ...prev, cities: false }));
     };
     fetchCities();
   }, [supabase]);
@@ -63,20 +76,24 @@ export default function AdsFilter() {
       setDistricts([]);
       return;
     }
-
     let cancelled = false;
 
     const fetchDistricts = async () => {
-      setIsLoading(true);
-      const { data } = await supabase
+      setIsLoading((prev) => ({ ...prev, districts: true }));
+
+      const { data, error } = await supabase
         .from("districts")
         .select("id,name,city_id")
         .eq("city_id", Number(city))
         .order("name");
-      if (!cancelled && data) {
-        setDistricts(data);
+      if (cancelled) return;
+      if (error) {
+        toast.error("Districts cannot load");
+      } else {
+        setDistricts(data || []);
       }
-      setIsLoading(false);
+
+      setIsLoading((prev) => ({ ...prev, districts: false }));
     };
     fetchDistricts();
     return () => {
@@ -93,19 +110,25 @@ export default function AdsFilter() {
     let cancelled = false;
 
     const fetchNeighborhoods = async () => {
-      const { data } = await supabase
+      setIsLoading((prev) => ({ ...prev, neighborhoods: true }));
+
+      const { data, error } = await supabase
         .from("neighborhoods")
         .select("id,name,county_id")
         .eq("county_id", Number(district))
         .order("name");
+      if (cancelled) return;
 
-      if (!cancelled && data) {
-        setNeighborhoods(data);
+      if (error) {
+        toast.error("Neighborhoods cannot load");
+      } else {
+        setNeighborhoods(data || []);
       }
+
+      setIsLoading((prev) => ({ ...prev, neighborhoods: false }));
     };
 
     fetchNeighborhoods();
-
     return () => {
       cancelled = true;
     };
@@ -113,22 +136,33 @@ export default function AdsFilter() {
 
   // --- Handlers ---
   const applyFilter = useCallback(() => {
+    const validation = filterSchema.safeParse({ minPrice, maxPrice });
+    if (!validation.success) {
+      toast.error(validation.error.issues[0].message);
+      return;
+    }
     const params = new URLSearchParams(searchParams.toString());
 
     // Sayfalamayı sıfırla (Filtre değişince 1. sayfaya dönmeli)
     // Reset pagination (Should return to page 1 when filter changes)
     params.delete("page");
 
-    if (city) params.set("city", city);
-    else params.delete("city");
-    if (district) params.set("district", district);
-    else params.delete("district");
-    if (neighborhood) params.set("neighborhood", neighborhood);
-    else params.delete("neighborhood");
-    if (minPrice) params.set("minPrice", minPrice);
-    else params.delete("minPrice");
-    if (maxPrice) params.set("maxPrice", maxPrice);
-    else params.delete("maxPrice");
+    // if (city) params.set("city", city);
+    // else params.delete("city");
+    // if (district) params.set("district", district);
+    // else params.delete("district");
+    // if (neighborhood) params.set("neighborhood", neighborhood);
+    // else params.delete("neighborhood");
+    // if (minPrice) params.set("minPrice", minPrice);
+    // else params.delete("minPrice");
+    // if (maxPrice) params.set("maxPrice", maxPrice);
+    // else params.delete("maxPrice");
+
+    const allFilters = { city, district, neighborhood, minPrice, maxPrice };
+    Object.entries(allFilters).forEach(([key, value]) => {
+      if (value) params.set(key, value.toString());
+      else params.delete(key);
+    });
 
     const nextUrl = `/ads?${params.toString()}`;
     const currentUrl = `/ads?${searchParams.toString()}`;
@@ -176,7 +210,7 @@ export default function AdsFilter() {
       {/* İlçe Seçimi */}
       <div className="flex flex-col gap-1.5">
         <label className="text-xs font-semibold text-gray-500 ml-1">
-          Discrict
+          District
         </label>
         <select
           value={district}
@@ -184,10 +218,10 @@ export default function AdsFilter() {
             setDistrict(e.target.value);
             setNeighborhood("");
           }}
-          disabled={!city || isLoading}
+          disabled={!city || isLoading.districts}
           className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 outline-none min-w-35 disabled:bg-gray-50"
         >
-          <option value="">All</option>
+          <option value="">{isLoading.districts ? "Loading..." : "All"}</option>
           {districts.map((d) => (
             <option key={d.id} value={d.id}>
               {d.name}
@@ -203,10 +237,12 @@ export default function AdsFilter() {
         <select
           value={neighborhood}
           onChange={(e) => setNeighborhood(e.target.value)}
-          disabled={!district}
+          disabled={!district || isLoading.neighborhoods}
           className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 outline-none min-w-35 disabled:bg-gray-50"
         >
-          <option value="">All</option>
+          <option value="">
+            {isLoading.neighborhoods ? "Loading..." : "All"}
+          </option>
           {neighborhoods.map((n) => (
             <option key={n.id} value={n.id}>
               {n.name}
