@@ -6,6 +6,7 @@ import PropertyHeader from "./_components/PropertyHeader";
 import PropertyGallery from "./_components/galery/PropertyGallery";
 import PropertyFeatures from "./_components/PropertyFeatures";
 import PropertyDescription from "./_components/PropertyDescription";
+import PropertyAgentCard from "./_components/PropertyAgentCard";
 
 export default async function PropertyDetailPage({
   params,
@@ -57,7 +58,7 @@ export default async function PropertyDetailPage({
           {/* RIGHT SİDE TARAF: Sticky ASSISTANT CARD (%33) -  */}
           <div className="lg:col-span-1">
             <div className="sticky top-24">
-              {/* <PropertyAgentCard user={typedProperty.user} /> */}
+              <PropertyAgentCard price={typedProperty.price} />
             </div>
           </div>
         </div>
