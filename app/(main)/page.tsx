@@ -8,6 +8,7 @@ import AdCategories from "@/components/ads/adCategories/AdCategories";
 import { STATIC_CATEGORIES } from "@/lib/constants/categories";
 import AdsFilter from "@/components/ads/adCategories/AdsFilter";
 import BannerFamily from "./_components/banner/BannerFamily";
+import AboutStats from "./about/_components/AboutStats";
 
 export default async function Home({
   searchParams,
@@ -32,6 +33,7 @@ export default async function Home({
         <AdsList sort={sort} selectedCategory={category} params="home" />
       </Suspense>
       <BannerFamily />
+      <AboutStats />
     </div>
   );
 }
