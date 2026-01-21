@@ -3,6 +3,7 @@ import { Property } from "@/types/propertiesType";
 import { notFound } from "next/navigation";
 import React from "react";
 import PropertyHeader from "./_components/PropertyHeader";
+import PropertyGallery from "./_components/galery/PropertyGallery";
 
 export default async function PropertyDetailPage({
   params,
@@ -35,8 +36,10 @@ export default async function PropertyDetailPage({
 
   return (
     <div>
-      <div className="max-w-7xl mx-auto px-4 py-10">
-        <PropertyHeader property={property} />
+      <div className="h-16 w-full bg-black"></div>
+      <div className="max-w-7xl mx-auto px-4 py-10 overflow-hidden">
+        <PropertyHeader property={typedProperty} />
+        <PropertyGallery images={typedProperty.images ?? []} />
       </div>
     </div>
   );
