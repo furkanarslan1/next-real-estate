@@ -118,10 +118,14 @@ export function StepBasicInfo({ form }: StepBasicInfoProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="konut">Residential (Konut)</SelectItem>
-                  <SelectItem value="is_yeri">Commercial (İş Yeri)</SelectItem>
-                  <SelectItem value="arsa">Land (Arsa)</SelectItem>
-                  <SelectItem value="proje">Project (Proje)</SelectItem>
+                  <SelectItem value="residential">
+                    Residential (residential)
+                  </SelectItem>
+                  <SelectItem value="commercial">
+                    Commercial (commercial)
+                  </SelectItem>
+                  <SelectItem value="land">Land (land)</SelectItem>
+                  <SelectItem value="project">projectct (project)</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -143,8 +147,8 @@ export function StepBasicInfo({ form }: StepBasicInfoProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="satilik">For Sale (Satılık)</SelectItem>
-                  <SelectItem value="kiralik">For Rent (Kiralık)</SelectItem>
+                  <SelectItem value="sale">For Sale </SelectItem>
+                  <SelectItem value="rent">For Rent </SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />

@@ -14,7 +14,9 @@ interface AdCategoriesProps {
   categories: Category[];
 }
 
-export default function AdCategories({ categories }: AdCategoriesProps) {
+export default function PropertiesCategories({
+  categories,
+}: AdCategoriesProps) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();

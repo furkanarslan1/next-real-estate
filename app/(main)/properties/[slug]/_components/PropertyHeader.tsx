@@ -35,7 +35,7 @@ export default function PropertyHeader({ property }: PropertyHeaderProps) {
             <span className="text-slate-300">•</span>
 
             <span className="bg-orange-50 text-orange-500 px-3 py-1 rounded-full text-xs font-semibold border border-orange-100">
-              {property.status === "satilik" ? "Satılık" : "Kiralık"}
+              {property.status === "sale" ? "sale" : "rent"}
             </span>
           </div>
         </div>

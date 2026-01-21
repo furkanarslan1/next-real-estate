@@ -1,5 +1,6 @@
 import React from "react";
 import Header from "./_components/header/Header";
+import Footer from "./_components/Footer";
 
 export default async function MainLayout({
   children,
@@ -16,7 +17,7 @@ export default async function MainLayout({
         <Header />
       </header>
       <main className="min-h-screen ">{children}</main>
-      {/* <Footer /> */}
+      <Footer />
     </>
   );
 }

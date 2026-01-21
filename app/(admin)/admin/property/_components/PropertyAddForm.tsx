@@ -36,10 +36,10 @@ export default function PropertyAddForm({ initialData }: PropertyAddFormProps) {
   const [capturedFiles, setCapturedFiles] = useState<ImageFile[]>([]);
 
   const [existingImages, setExistingImages] = useState<string[]>(
-    initialData?.images || []
+    initialData?.images || [],
   );
   const [coverImage, setCoverImage] = useState<string>(
-    initialData?.images?.[0] || ""
+    initialData?.images?.[0] || "",
   );
 
   const form = useForm<PropertyFormInput>({
@@ -62,8 +62,8 @@ export default function PropertyAddForm({ initialData }: PropertyAddFormProps) {
       : {
           title: "",
           description: "",
-          category: "konut",
-          status: "satilik",
+          category: "residential",
+          status: "sale",
           price: 0,
           area_gross: 0,
           area_net: 0,
@@ -222,7 +222,7 @@ export default function PropertyAddForm({ initialData }: PropertyAddFormProps) {
         result = await updatePropertyAction(
           initialData.id,
           cleanValues,
-          finalImageUrls
+          finalImageUrls,
         );
       } else {
         result = await addPropertyAction(cleanValues, finalImageUrls);
@@ -239,7 +239,7 @@ export default function PropertyAddForm({ initialData }: PropertyAddFormProps) {
 
       // CLEANUP LOGIC / TEMİZLİK MANTIĞI
       // If we have uploaded files but the process failed, delete them from storage
-      // Eğer yüklenen dosyalar varsa ama işlem başarısız olduysa, onları depolamadan sil
+      // Eğer yüklenen dosyalar vland ama işlem başarısız olduysa, onları depolamadan sil
       if (successfulUploads.length > 0) {
         const supabase = createClient();
         await supabase.storage
@@ -281,7 +281,7 @@ export default function PropertyAddForm({ initialData }: PropertyAddFormProps) {
               onSetCover={setCoverImage} //
               onRemoveInitialImage={(urlToRemove) => {
                 setExistingImages((prev) =>
-                  prev.filter((url) => url !== urlToRemove)
+                  prev.filter((url) => url !== urlToRemove),
                 );
                 if (coverImage === urlToRemove) setCoverImage("");
               }}

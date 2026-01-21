@@ -1,5 +1,5 @@
 import React from "react";
-import PropertyCard from "@/components/ads/PropertyCard"; //
+import PropertyCard from "@/components/properties/PropertyCard"; //
 import { Property } from "@/types/propertiesType";
 
 type SimilarPropertyMinimal = Pick<

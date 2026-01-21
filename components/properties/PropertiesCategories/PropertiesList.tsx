@@ -8,7 +8,7 @@ import Pagination from "@/components/pagination/Pagination";
 
 const ITEMS_PER_PAGE = 12;
 
-export default async function AdsList({
+export default async function PropertiesList({
   selectedCategory,
   params,
   sort,
@@ -128,7 +128,7 @@ export default async function AdsList({
             variant="outline"
             className="rounded-full border-orange-500 text-orange-600 hover:bg-orange-50"
           >
-            <Link href="/ads">View All Listings</Link>
+            <Link href="/properties">View All Listings</Link>
           </Button>
         </div>
       )}

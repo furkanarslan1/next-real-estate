@@ -3,8 +3,8 @@ import * as z from "zod";
 export const propertySchema = z.object({
   title: z.string().min(10).max(100),
   description: z.string().min(20),
-  category: z.enum(["konut", "is_yeri", "arsa", "proje"]),
-  status: z.enum(["satilik", "kiralik"]),
+  category: z.enum(["residential", "commercial", "land", "project"]),
+  status: z.enum(["sale", "rent"]),
 
   // 🔴 Buradaki transform(Number) KRİTİK
   price: z.coerce.number().min(0).transform(Number),

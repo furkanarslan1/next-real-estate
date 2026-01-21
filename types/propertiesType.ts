@@ -4,8 +4,8 @@ export interface Property {
   title: string;
   description: string | null;
   price: number;
-  category: "konut" | "arsa" | "is_yeri" | "proje";
-  status: "satilik" | "kiralik";
+  category: "residential" | "land" | "commercial" | "project";
+  status: "sale" | "rent";
   city_id: number;
   district_id: number;
   neighborhood_id: number;

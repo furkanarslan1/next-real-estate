@@ -1,8 +1,8 @@
-import AdCategories from "@/components/ads/adCategories/AdCategories";
-import AdsFilter from "@/components/ads/adCategories/AdsFilter";
-import AdsList from "@/components/ads/adCategories/AdsList";
-import { AdsListSkeleton } from "@/components/ads/PropertyCardSkeleton";
-import SortFilter from "@/components/ads/SortFilter";
+import PropertiesCategories from "@/components/properties/PropertiesCategories/PropertiesCategories";
+import PropertiesFilter from "@/components/properties/PropertiesCategories/PropertiesFilter";
+import PropertiesList from "@/components/properties/PropertiesCategories/PropertiesList";
+import { AdsListSkeleton } from "@/components/properties/PropertyCardSkeleton";
+import SortFilter from "@/components/properties/SortFilter";
 import { STATIC_CATEGORIES } from "@/lib/constants/categories";
 import { Suspense } from "react";
 
@@ -26,11 +26,11 @@ export default async function AdsPage({
     <div className=" space-y-8">
       <div className="h-16 bg-black"></div>
       <div className="max-w-7xl mx-auto px-4  space-y-4">
-        <AdsFilter />
-        <AdCategories categories={STATIC_CATEGORIES || []} />
+        <PropertiesFilter />
+        <PropertiesCategories categories={STATIC_CATEGORIES || []} />
         <SortFilter />
         <Suspense key={suspenseKey} fallback={<AdsListSkeleton />}>
-          <AdsList
+          <PropertiesList
             selectedCategory={category}
             params="adsList"
             sort={params.sort}

@@ -32,7 +32,7 @@ export default function PropertyCard({
   });
 
   return (
-    <Link href={`/ads/${titleSlug}-${property.id}`} className="group">
+    <Link href={`/properties/${titleSlug}-${property.id}`} className="group">
       <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300">
         {/* IMAGE */}
         <div className="relative aspect-4/3 overflow-hidden">
@@ -43,7 +43,7 @@ export default function PropertyCard({
           />
           <div className="absolute top-3 left-3 flex gap-2">
             <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-lg text-[10px] font-bold uppercase text-slate-700">
-              {property.status === "satilik" ? "SATILIK" : "KİRALIK"}
+              {property.status === "sale" ? "sale" : "KİRALIK"}
             </span>
           </div>
         </div>

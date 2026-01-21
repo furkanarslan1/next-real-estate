@@ -26,8 +26,8 @@ interface CategoryChartProps {
 }
 
 const chartConfig = {
-  konut: { label: "Residential", color: "#f97316" },
-  arsa: { label: "Land", color: "#3b82f6" },
+  residential: { label: "Residential", color: "#f97316" },
+  land: { label: "Land", color: "#3b82f6" },
   isyeri: { label: "Commercial", color: "#22c55e" },
 };
 

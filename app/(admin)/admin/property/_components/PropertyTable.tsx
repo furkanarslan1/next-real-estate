@@ -35,8 +35,8 @@ export interface Property {
   created_at: string;
   title: string;
   price: number;
-  category: "konut" | "arsa" | "is_yeri" | "proje";
-  status: "satilik" | "kiralik";
+  category: "residential" | "land" | "commercial" | "project";
+  status: "sale" | "rent";
   images: string[] | null;
 }
 
@@ -53,7 +53,7 @@ export default function PropertyTable({ data }: PropertyTableProps) {
     // 1. Ask for user confirmation (UX Safety)
     // 1. Kullanıcıdan onay iste (UX Güvenliği)
     const isConfirmed = confirm(
-      "Are you sure? This will delete the property and all its images permanently."
+      "Are you sure? This will delete the property and all its images permanently.",
     );
 
     if (!isConfirmed) return;
@@ -140,23 +140,23 @@ export default function PropertyTable({ data }: PropertyTableProps) {
               </TableCell>
               <TableCell className="hidden md:table-cell">
                 <Badge variant="outline" className="capitalize font-normal">
-                  {item.category === "is_yeri"
+                  {item.category === "commercial"
                     ? "Commercial"
-                    : item.category === "konut"
-                    ? "Residential"
-                    : item.category}
+                    : item.category === "residential"
+                      ? "Residential"
+                      : item.category}
                 </Badge>
               </TableCell>
               <TableCell className="hidden md:table-cell">
                 <Badge
                   className={
-                    item.status === "satilik"
+                    item.status === "sale"
                       ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                       : "bg-sky-50 text-sky-700 border-sky-200"
                   }
                   variant="outline"
                 >
-                  {item.status === "satilik" ? "FOR SALE" : "FOR RENT"}
+                  {item.status === "sale" ? "FOR SALE" : "FOR RENT"}
                 </Badge>
               </TableCell>
               <TableCell className="font-semibold hidden md:table-cell">

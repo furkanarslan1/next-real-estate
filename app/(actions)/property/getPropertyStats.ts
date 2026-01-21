@@ -15,19 +15,19 @@ export async function getDashboardStats() {
   }
 
   const total = properties.length;
-  const forSale = properties.filter((p) => p.status === "satilik").length;
-  const forRent = properties.filter((p) => p.status === "kiralik").length;
+  const forSale = properties.filter((p) => p.status === "sale").length;
+  const forRent = properties.filter((p) => p.status === "rent").length;
 
   const categoryLabels: Record<string, string> = {
-    konut: "Residential",
-    is_yeri: "Commercial",
-    arsa: "Land",
+    residential: "Residential",
+    commercial: "Commercial",
+    land: "Land",
   };
 
   const categoryColors: Record<string, string> = {
-    konut: "#f97316",
-    is_yeri: "#22c55e",
-    arsa: "#3b82f6",
+    residential: "#f97316",
+    commercial: "#22c55e",
+    land: "#3b82f6",
   };
 
   const chartData = Object.keys(categoryLabels).map((cat) => ({

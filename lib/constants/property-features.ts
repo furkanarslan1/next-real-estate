@@ -10,7 +10,7 @@ export interface FeatureConfig {
 }
 
 export const PROPERTY_FEATURES: Record<string, FeatureConfig[]> = {
-  konut: [
+  residential: [
     {
       id: "room_count",
       label: "Room Count",
@@ -58,13 +58,13 @@ export const PROPERTY_FEATURES: Record<string, FeatureConfig[]> = {
     { id: "swap", label: "Swap / Exchange", type: "switch" },
     { id: "in_site", label: "Inside a Housing Estate", type: "switch" },
   ],
-  arsa: [
+  land: [
     { id: "zoning_status", label: "Zoning Status", type: "input" },
     { id: "ada", label: "Block Number (Ada)", type: "input" },
     { id: "parsel", label: "Plot Number (Parsel)", type: "input" },
     { id: "swap", label: "Swap / Exchange", type: "switch" },
   ],
-  is_yeri: [
+  commercial: [
     { id: "building_age", label: "Building Age", type: "input" },
     {
       id: "parking",
@@ -75,10 +75,10 @@ export const PROPERTY_FEATURES: Record<string, FeatureConfig[]> = {
     { id: "furnished", label: "Furnished", type: "switch" },
     { id: "swap", label: "Swap / Exchange", type: "switch" },
   ],
-  proje: [
+  project: [
     {
       id: "usage_status",
-      label: "Project Status",
+      label: "projectct Status",
       type: "select",
       options: ["vacant", "tenant", "property_owner"],
     },

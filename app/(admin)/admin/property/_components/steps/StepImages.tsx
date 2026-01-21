@@ -44,7 +44,7 @@ export function StepImages({
   const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
   useEffect(() => {
-    // Eğer henüz bir kapak seçilmemişse VE resim varsa (eski veya yeni)
+    // Eğer henüz bir kapak seçilmemişse VE resim vland (eski veya yeni)
     if (!coverImage) {
       if (initialImages.length > 0) {
         onSetCover(initialImages[0]);
@@ -71,13 +71,13 @@ export function StepImages({
   const validateFile = (file: File): boolean => {
     if (!ACCEPTED_TYPES.includes(file.type)) {
       toast.error(
-        `Unsupported format: ${file.name}. Please use JPG, PNG or WEBP.`
+        `Unsupported format: ${file.name}. Please use JPG, PNG or WEBP.`,
       );
       return false;
     }
     if (file.size > MAX_FILE_SIZE) {
       toast.error(
-        `File too large: ${file.name}. Maximum limit is 5MB before compression.`
+        `File too large: ${file.name}. Maximum limit is 5MB before compression.`,
       );
       return false;
     }
@@ -111,7 +111,7 @@ export function StepImages({
         // Step 2: Check compressed size again (extra safety) / Ek güvenlik kontrolü
         if (compressed.size > 2 * 1024 * 1024) {
           toast.warning(
-            `${file.name} is still over 2MB after compression. Performance might be affected.`
+            `${file.name} is still over 2MB after compression. Performance might be affected.`,
           );
         }
 

@@ -6,7 +6,7 @@ export default function SortFilter() {
   const router = useRouter();
   const pathname = usePathname();
 
-  // URL'den mevcut sıralamayı al, yoksa 'newest' varsay
+  // URL'den mevcut sıralamayı al, yoksa 'newest' vlandy
   // Get the current ranking from the URL, otherwise assume 'newest'
   const currentSort = searchParams.get("sort") || "newest";
 
@@ -14,7 +14,7 @@ export default function SortFilter() {
     const params = new URLSearchParams(searchParams.toString());
 
     if (value === "newest") {
-      // Eğer varsayılan seçildiyse URL'yi temiz tutmak için parametreyi silelim
+      // Eğer vlandyılan seçildiyse URL'yi temiz tutmak için parametreyi silelim
       // If the default is selected, delete the parameter to keep the URL clean.
       params.delete("sort");
     } else {

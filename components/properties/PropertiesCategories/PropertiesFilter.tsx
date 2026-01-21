@@ -17,7 +17,7 @@ type City = { id: number; name: string };
 type District = { id: number; name: string; city_id: number };
 type Neighborhood = { id: number; name: string; county_id: number };
 
-export default function AdsFilter() {
+export default function PropertiesFilter() {
   const supabase = useMemo(() => createClient(), []);
 
   const router = useRouter();
@@ -164,8 +164,8 @@ export default function AdsFilter() {
       else params.delete(key);
     });
 
-    const nextUrl = `/ads?${params.toString()}`;
-    const currentUrl = `/ads?${searchParams.toString()}`;
+    const nextUrl = `/properties?${params.toString()}`;
+    const currentUrl = `/properties?${searchParams.toString()}`;
 
     if (nextUrl !== currentUrl) {
       startTransition(() => {
@@ -181,7 +181,7 @@ export default function AdsFilter() {
     setMinPrice("");
     setMaxPrice("");
     startTransition(() => {
-      router.push("/ads");
+      router.push("/properties");
     });
   };
 

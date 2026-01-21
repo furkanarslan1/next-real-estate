@@ -59,10 +59,10 @@ export function PropertySearchFilters() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Categories</SelectItem>
-            <SelectItem value="konut">Residential</SelectItem>
-            <SelectItem value="is_yeri">Commercial</SelectItem>
-            <SelectItem value="arsa">Land</SelectItem>
-            <SelectItem value="proje">Project</SelectItem>
+            <SelectItem value="residential">Residential</SelectItem>
+            <SelectItem value="commercial">Commercial</SelectItem>
+            <SelectItem value="land">Land</SelectItem>
+            <SelectItem value="project">projectct</SelectItem>
           </SelectContent>
         </Select>
 
