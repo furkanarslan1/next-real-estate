@@ -19,7 +19,7 @@ export default async function Home({
   searchParams: Promise<{ category?: string; sort?: string }>;
 }) {
   const params = await searchParams;
-  const category = params.category || "all";
+  const category = params.category || "residential";
   const suspenseKey = JSON.stringify(params);
   const sort = params.sort;
 

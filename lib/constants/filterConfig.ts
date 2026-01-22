@@ -10,9 +10,10 @@ export const CATEGORY_DETAILS: Record<string, FilterFieldType[]> = {
     },
     {
       label: "Building Age",
-      key: "age",
+      key: "building_age",
       type: "select",
       options: ["0", "1-5", "6-10", "11-15", "16-20", "21+"],
+      valueType: "range",
     },
     { label: "Floor Level", key: "floor", type: "number" },
     { label: "Total Floors", key: "total_floors", type: "number" },
@@ -20,13 +21,14 @@ export const CATEGORY_DETAILS: Record<string, FilterFieldType[]> = {
       label: "Heating",
       key: "heating",
       type: "select",
-      options: ["Natural Gas", "Central", "Air Conditioning", "Underfloor"],
+      options: ["Natural Gas", "Stove", "Air Conditioning"],
     },
     {
       label: "Furnished",
       key: "furnished",
       type: "select",
       options: ["Yes", "No"],
+      valueType: "boolean",
     },
     {
       label: "Using Status",

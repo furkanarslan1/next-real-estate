@@ -46,6 +46,7 @@ export default function PropertyAddForm({ initialData }: PropertyAddFormProps) {
     resolver: zodResolver(propertySchema),
     defaultValues: initialData
       ? {
+          ...initialData,
           title: initialData.title,
           description: initialData.description,
           category: initialData.category,

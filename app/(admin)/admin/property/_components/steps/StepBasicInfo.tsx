@@ -56,27 +56,49 @@ interface StepBasicInfoProps {
 export function StepBasicInfo({ form }: StepBasicInfoProps) {
   // Watch the category field / Kategori alanını izle
   const category = form.watch("category");
+  const prevCategoryRef = useRef<string | null>(null);
 
   // Create a flag to track the first render
   // İlk render'ı takip etmek için bir bayrak (flag) oluşturuyoruz
-  const isFirstRender = useRef(true);
+  // const isFirstRender = useRef(true);
+
+  // useEffect(() => {
+
+  //   // 1. If it's the first time the component loads, do nothing
+  //   // 1. Bileşen ilk yüklendiğinde (mount) hiçbir şey yapma
+  //   if (isFirstRender.current) {
+  //     isFirstRender.current = false; // Mark it as no longer first render / Artık ilk render değil diye işaretle
+  //     return;
+  //   }
+
+  //   const currentCategoryInForm = form.getValues("category");
+
+  //   // 2. Only reset if the category actually changes AFTER the initial load
+  //   // 2. Sadece ilk yüklemeden SONRA kategori gerçekten değişirse sıfırla
+  //   form.setValue("category_data", EMPTY_CATEGORY_DATA);
+
+  //   // 2. Kırmızı hata mesajlarını temizle (UX iyileştirmesi)
+  //   // Kullanıcı yeni kategoriye "temiz bir sayfa" ile başlasın
+  //   // 2. Remove red error messages (UX improvement) // Allow users to start with a "clean slate" in the new category
+  //   form.clearErrors("category_data");
+  // }, [category, form]);
 
   useEffect(() => {
-    // 1. If it's the first time the component loads, do nothing
-    // 1. Bileşen ilk yüklendiğinde (mount) hiçbir şey yapma
-    if (isFirstRender.current) {
-      isFirstRender.current = false; // Mark it as no longer first render / Artık ilk render değil diye işaretle
+    const prevCategory = prevCategoryRef.current;
+
+    // İlk render → sadece prevCategory'yi set et, reset yapma
+    if (prevCategory === null) {
+      prevCategoryRef.current = category;
       return;
     }
 
-    // 2. Only reset if the category actually changes AFTER the initial load
-    // 2. Sadece ilk yüklemeden SONRA kategori gerçekten değişirse sıfırla
-    form.setValue("category_data", EMPTY_CATEGORY_DATA);
+    // Kategori gerçekten değişmişse resetle
+    if (prevCategory !== category) {
+      form.setValue("category_data", EMPTY_CATEGORY_DATA);
+      form.clearErrors("category_data");
+    }
 
-    // 2. Kırmızı hata mesajlarını temizle (UX iyileştirmesi)
-    // Kullanıcı yeni kategoriye "temiz bir sayfa" ile başlasın
-    // 2. Remove red error messages (UX improvement) // Allow users to start with a "clean slate" in the new category
-    form.clearErrors("category_data");
+    prevCategoryRef.current = category;
   }, [category, form]);
 
   return (

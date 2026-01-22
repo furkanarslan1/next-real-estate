@@ -57,7 +57,7 @@ export default async function PropertiesList({
       { count: "exact" },
     )
     .eq("is_active", true);
-  if (selectedCategory && selectedCategory !== "all") {
+  if (selectedCategory) {
     query = query.eq("category", selectedCategory);
   }
 

@@ -22,7 +22,7 @@ export default async function PropertiesPage({
 }) {
   const params = await searchParams;
   const suspenseKey = JSON.stringify(params);
-  const category = params.category || "all";
+  const category = params.category || "residential";
   return (
     <div className=" space-y-8">
       <div className="h-16 bg-linear-to-bl from-slate-950 to-slate-700"></div>

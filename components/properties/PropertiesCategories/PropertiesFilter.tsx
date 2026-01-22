@@ -22,6 +22,27 @@ import {
 } from "@/components/ui/sheet";
 import { Settings2 } from "lucide-react";
 import DetailedFilters from "../DetailedFilters";
+import { CATEGORY_DETAILS } from "@/lib/constants/filterConfig";
+
+function normalizeFilterValue(
+  value: string,
+  valueType?: "string" | "boolean" | "number" | "range",
+) {
+  if (valueType === "boolean") {
+    return value === "Yes" ? "true" : "false";
+  }
+
+  if (valueType === "number") {
+    return String(Number(value));
+  }
+
+  if (valueType === "range") {
+    return value; // "1-5", "21+"
+  }
+
+  // string veya undefined ise aynen bırak
+  return value;
+}
 
 type City = { id: number; name: string };
 type District = { id: number; name: string; city_id: number };
@@ -202,8 +223,13 @@ export default function PropertiesFilter() {
 
     // Detaylı (JSONB) Filtreleri Ekle
     //add detail filters
-    Object.entries(extraParams).forEach(([key, value]) => {
-      if (value) params.set(key, value);
+    CATEGORY_DETAILS[category]?.forEach((field) => {
+      const rawValue = extraParams[field.key];
+      if (!rawValue) return;
+
+      const normalized = normalizeFilterValue(rawValue, field.valueType);
+
+      params.set(field.key, normalized);
     });
 
     // Sayfalamayı sıfırla (Filtre değişince 1. sayfaya dönmeli)
