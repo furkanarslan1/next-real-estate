@@ -18,25 +18,25 @@ export default async function PropertiesList({
   params: "home" | "adsList";
   sort?: string;
   searchParams?: {
-    city?: string;
-    district?: string;
-    minPrice?: string;
-    maxPrice?: string;
-    rooms?: string;
-    neighborhood?: string;
-    page?: string;
+    [key: string]: string | undefined;
   };
 }) {
   const supabase = await createClient();
   const city = searchParams?.city;
   const district = searchParams?.district;
+  // const minPrice = searchParams?.minPrice
+  //   ? Number(searchParams.minPrice)
+  //   : null;
+  // const maxPrice = searchParams?.maxPrice
+  //   ? Number(searchParams.maxPrice)
+  //   : null;
+  // const rooms = searchParams?.rooms ? Number(searchParams.rooms) : null;
   const minPrice = searchParams?.minPrice
     ? Number(searchParams.minPrice)
     : null;
   const maxPrice = searchParams?.maxPrice
     ? Number(searchParams.maxPrice)
     : null;
-  const rooms = searchParams?.rooms ? Number(searchParams.rooms) : null;
   const neighborhood = searchParams?.neighborhood;
   const currentPage = searchParams?.page ? Number(searchParams.page) : 1;
 
@@ -66,7 +66,28 @@ export default async function PropertiesList({
   if (minPrice) query.gte("price", minPrice);
   if (maxPrice) query.lte("price", maxPrice);
   if (neighborhood) query.eq("neighborhood_id", Number(neighborhood));
-  if (rooms) query.contains("category_data", { rooms: rooms });
+  // if (rooms) query.contains("category_data", { rooms: rooms });
+
+  //Bu liste dışındaki her parametre category_data içinde aranacak
+  //Any parameter not included in this list will be searched within category_data.
+  const coreKeys = [
+    "city",
+    "district",
+    "neighborhood",
+    "minPrice",
+    "maxPrice",
+    "category",
+    "page",
+    "sort",
+  ];
+
+  if (searchParams) {
+    Object.entries(searchParams).forEach(([key, value]) => {
+      if (!coreKeys.includes(key) && value) {
+        query = query.filter(`category_data->>${key}`, "eq", value);
+      }
+    });
+  }
   // SORT
   if (sort === "price-asc") {
     query = query.order("price", { ascending: true });

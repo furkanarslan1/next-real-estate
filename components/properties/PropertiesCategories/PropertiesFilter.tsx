@@ -13,6 +13,16 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { filterSchema } from "@/schemas/filterSchema";
 
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Settings2 } from "lucide-react";
+import DetailedFilters from "../DetailedFilters";
+
 type City = { id: number; name: string };
 type District = { id: number; name: string; city_id: number };
 type Neighborhood = { id: number; name: string; county_id: number };
@@ -25,6 +35,10 @@ export default function PropertiesFilter() {
   const [isPending, startTransition] = useTransition();
 
   // --- States ---
+  const initialCategory = searchParams.get("category");
+  const [category, setCategory] = useState(
+    initialCategory && initialCategory !== "" ? initialCategory : "residential",
+  );
   const [city, setCity] = useState(searchParams.get("city") || "");
   const [district, setDistrict] = useState(searchParams.get("district") || "");
   const [neighborhood, setNeighborhood] = useState(
@@ -32,6 +46,26 @@ export default function PropertiesFilter() {
   );
   const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
   const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
+
+  // DETAIL FILTER
+  const [extraParams, setExtraParams] = useState<Record<string, string>>(() => {
+    const params: Record<string, string> = {};
+    const corekeys = [
+      "city",
+      "district",
+      "neighborhood",
+      "minPrice",
+      "maxPrice",
+      "category",
+      "page",
+    ];
+    searchParams.forEach((value, key) => {
+      if (!corekeys.includes(key)) {
+        params[key] = value;
+      }
+    });
+    return params;
+  });
 
   const [cities, setCities] = useState<City[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
@@ -45,6 +79,15 @@ export default function PropertiesFilter() {
   // --- URL Değiştiğinde State'leri Güncelle (Geri/İleri butonu için) ---
   // --- Update States When URL Changes (For Back/Next Button) ---
   useEffect(() => {
+    const urlCategory = searchParams.get("category");
+    // Eğer URL'de kategori varsa onu al, yoksa residential yap.
+    // Ama asla boş string veya null bırakma.
+    if (urlCategory) {
+      setCategory(urlCategory);
+    } else {
+      // URL boş olsa bile state'i residential tut ki DetailedFilters tetiklensin
+      setCategory("residential");
+    }
     setCity(searchParams.get("city") || "");
     setDistrict(searchParams.get("district") || "");
     setNeighborhood(searchParams.get("neighborhood") || "");
@@ -143,6 +186,26 @@ export default function PropertiesFilter() {
     }
     const params = new URLSearchParams(searchParams.toString());
 
+    //add base filters
+
+    const coreFilters: Record<string, string> = {
+      category,
+      city,
+      district,
+      neighborhood,
+      minPrice,
+      maxPrice,
+    };
+    Object.entries(coreFilters).forEach(([key, value]) => {
+      if (value) params.set(key, value);
+    });
+
+    // Detaylı (JSONB) Filtreleri Ekle
+    //add detail filters
+    Object.entries(extraParams).forEach(([key, value]) => {
+      if (value) params.set(key, value);
+    });
+
     // Sayfalamayı sıfırla (Filtre değişince 1. sayfaya dönmeli)
     // Reset pagination (Should return to page 1 when filter changes)
     params.delete("page");
@@ -158,11 +221,11 @@ export default function PropertiesFilter() {
     // if (maxPrice) params.set("maxPrice", maxPrice);
     // else params.delete("maxPrice");
 
-    const allFilters = { city, district, neighborhood, minPrice, maxPrice };
-    Object.entries(allFilters).forEach(([key, value]) => {
-      if (value) params.set(key, value.toString());
-      else params.delete(key);
-    });
+    // const allFilters = { city, district, neighborhood, minPrice, maxPrice };
+    // Object.entries(allFilters).forEach(([key, value]) => {
+    //   if (value) params.set(key, value.toString());
+    //   else params.delete(key);
+    // });
 
     const nextUrl = `/properties?${params.toString()}`;
     const currentUrl = `/properties?${searchParams.toString()}`;
@@ -172,21 +235,51 @@ export default function PropertiesFilter() {
         router.push(nextUrl);
       });
     }
-  }, [city, district, neighborhood, minPrice, maxPrice, router, searchParams]);
+  }, [
+    city,
+    category,
+    district,
+    neighborhood,
+    minPrice,
+    maxPrice,
+    extraParams,
+    router,
+    searchParams,
+  ]);
 
   const resetFilters = () => {
+    setCategory("residential");
     setCity("");
     setDistrict("");
     setNeighborhood("");
     setMinPrice("");
     setMaxPrice("");
+    setExtraParams({});
     startTransition(() => {
-      router.push("/properties");
+      router.push("/properties?category=residential");
     });
   };
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-wrap items-end gap-4">
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-bold text-slate-500 ml-1">
+          Category
+        </label>
+        <select
+          value={category}
+          onChange={(e) => {
+            setCategory(e.target.value);
+            setExtraParams({}); // Clear details when switching category
+          }}
+          className="border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none min-w-40 bg-slate-50"
+        >
+          <option value="residential">Residential</option>
+          <option value="commercial">Commercial</option>
+          <option value="land">Land</option>
+          <option value="project">Project</option>
+        </select>
+      </div>
       <div className="flex flex-col gap-1.5">
         <label className="text-xs font-semibold text-gray-500 ml-1">City</label>
         <select
@@ -273,21 +366,58 @@ export default function PropertiesFilter() {
         </div>
       </div>
 
+      {/* ACTION BUTTONS */}
       <div className="flex gap-2 ml-auto">
-        <Button
-          variant="ghost"
-          onClick={resetFilters}
-          className="text-gray-500 text-sm"
-        >
-          Clean
-        </Button>
-        <Button
-          onClick={applyFilter}
-          disabled={isPending}
-          className="bg-orange-600 hover:bg-orange-700 text-white px-8 rounded-lg shadow-md transition-all active:scale-95"
-        >
-          {isPending ? "Filtering.." : "Filter"}
-        </Button>
+        {/* DETAIL FILTER(SHEET) */}
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button
+              variant="outline"
+              className="flex gap-2 border-gray-200 text-gray-600"
+            >
+              <Settings2 size={18} />
+              Advanced
+            </Button>
+          </SheetTrigger>
+          <SheetContent className="w-100 sm:w-125 overflow-y-auto p-4">
+            <SheetHeader>
+              <SheetTitle className="text-2xl font-black">
+                Advanced Filters
+              </SheetTitle>
+            </SheetHeader>
+            <div className="mt-8 space-y-6">
+              <DetailedFilters
+                category={category}
+                extraParams={extraParams}
+                setExtraParams={setExtraParams}
+              />
+
+              <Button
+                onClick={applyFilter}
+                className="w-full bg-orange-600 h-12 text-lg hover:bg-orange-700"
+              >
+                Show Results
+              </Button>
+            </div>
+          </SheetContent>
+        </Sheet>
+
+        <div className="flex gap-2 ml-auto">
+          <Button
+            variant="ghost"
+            onClick={resetFilters}
+            className="text-gray-500 text-sm"
+          >
+            Clean
+          </Button>
+          <Button
+            onClick={applyFilter}
+            disabled={isPending}
+            className="bg-orange-600 hover:bg-orange-700 text-white px-8 rounded-lg shadow-md transition-all active:scale-95"
+          >
+            {isPending ? "Filtering.." : "Filter"}
+          </Button>
+        </div>
       </div>
     </div>
   );

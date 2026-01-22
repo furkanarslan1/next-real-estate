@@ -6,17 +6,18 @@ import SortFilter from "@/components/properties/SortFilter";
 import { STATIC_CATEGORIES } from "@/lib/constants/categories";
 import { Suspense } from "react";
 
-export default async function AdsPage({
+export default async function PropertiesPage({
   searchParams,
 }: {
   searchParams: Promise<{
-    city?: string;
-    district?: string;
-    minPrice?: string;
-    maxPrice?: string;
-    rooms?: string;
-    sort?: string;
-    category?: string;
+    // city?: string;
+    // district?: string;
+    // minPrice?: string;
+    // maxPrice?: string;
+    // rooms?: string;
+    // sort?: string;
+    // category?: string;
+    [key: string]: string | undefined;
   }>;
 }) {
   const params = await searchParams;

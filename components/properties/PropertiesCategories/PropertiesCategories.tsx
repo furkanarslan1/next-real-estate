@@ -20,30 +20,18 @@ export default function PropertiesCategories({
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
-  const selectedCategory = searchParams.get("category");
+  const selectedCategory = searchParams.get("category") || "residential";
 
-  const handleChange = (value: string | null) => {
+  const handleChange = (value: string) => {
     const params = new URLSearchParams(searchParams);
-    params.set("category", value || "all");
+    params.set("category", value);
+    params.delete("page");
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   return (
     <div className="bg-gray-200 p-2 rounded-md mb-4 text-sm">
       <Swiper spaceBetween={9} slidesPerView={"auto"} freeMode>
-        {/* ALL */}
-        <SwiperSlide style={{ width: "auto" }}>
-          <div
-            onClick={() => handleChange("all")}
-            className={`px-4 py-2 rounded-md cursor-pointer text-sm ${
-              !selectedCategory || selectedCategory === "all"
-                ? "bg-white"
-                : "bg-gray-200"
-            }`}
-          >
-            All
-          </div>
-        </SwiperSlide>
         {categories.map((cat) => (
           <SwiperSlide key={cat.id} style={{ width: "auto" }}>
             <div
