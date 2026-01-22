@@ -4,7 +4,7 @@ export const CATEGORY_DETAILS: Record<string, FilterFieldType[]> = {
   residential: [
     {
       label: "Room Count",
-      key: "rooms",
+      key: "room_count",
       type: "select",
       options: ["1+0", "1+1", "2+1", "3+1", "4+1", "5+1"],
     },

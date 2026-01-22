@@ -24,7 +24,7 @@ export default function PropertyCard({
 }: {
   property: PropertyCardData;
 }) {
-  const mainImage = property.images?.[0] || "/placeholder.jpg";
+  const mainImage = property.images?.[0] || "/real-estate-hero-2.jpg";
   const titleSlug = slugify(property.title, {
     lower: true,
     strict: true,
@@ -43,7 +43,7 @@ export default function PropertyCard({
           />
           <div className="absolute top-3 left-3 flex gap-2">
             <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-lg text-[10px] font-bold uppercase text-slate-700">
-              {property.status === "sale" ? "sale" : "KİRALIK"}
+              {property.status === "sale" ? "sale" : "rent"}
             </span>
           </div>
         </div>
@@ -55,7 +55,7 @@ export default function PropertyCard({
           </h3>
 
           <p className="text-orange-600 font-extrabold text-xl mt-1">
-            {new Intl.NumberFormat("tr-TR").format(property.price)} ₺
+            {new Intl.NumberFormat("tr-TR").format(property.price)} $
           </p>
 
           {/* FEATURES M2 ROOM COUNT VS */}

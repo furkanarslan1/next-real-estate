@@ -44,7 +44,7 @@ export default function PropertyHeader({ property }: PropertyHeaderProps) {
         <div className="bg-orange-500/10 border border-orange-200 rounded-2xl px-6 py-4 text-right min-w-55">
           <p className="text-xs text-orange-500 font-medium mb-1">Price</p>
           <p className="text-2xl font-black text-orange-500">
-            ₺ {formattedPrice}
+            $ {formattedPrice}
           </p>
         </div>
       </div>

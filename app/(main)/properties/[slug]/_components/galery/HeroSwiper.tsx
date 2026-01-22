@@ -38,7 +38,7 @@ export default function HeroSwiper({
             >
               <Image
                 src={img}
-                alt={`İlan Fotoğrafı ${i + 1}`}
+                alt={`Property Images ${i + 1}`}
                 fill
                 priority={i === 0}
                 sizes="100vw"

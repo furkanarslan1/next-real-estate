@@ -22,7 +22,7 @@ export default function GalleryModal({ images, startIndex, onClose }: Props) {
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="w-screen h-screen max-w-none bg-black p-0">
-        <DialogTitle className="sr-only">İlan Fotoğrafları</DialogTitle>
+        <DialogTitle className="sr-only">Property Images</DialogTitle>
 
         {/* CLOSE*/}
         <button

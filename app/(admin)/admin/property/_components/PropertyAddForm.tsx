@@ -207,12 +207,36 @@ export default function PropertyAddForm({ initialData }: PropertyAddFormProps) {
       // We pass the data, uploaded links, and user ID
       // Verileri, yüklenen linkleri ve kullanıcı ID'sini gönderiyoruz
 
-      if (coverImage) {
-        // Seçilen kapak resmini mevcut listeden bul ve en başa taşı
-        // Bu sayede veritabanına giden dizide images[0] her zaman seçilen kapak olur
+      // 1. Önce yüklenen dosyalar ile preview URL'leri arasında bir harita oluşturun
+      const previewToPublicMap = capturedFiles.reduce(
+        (acc, imgObj, index) => {
+          acc[imgObj.preview] = uploadedUrls[index];
+          return acc;
+        },
+        {} as Record<string, string>,
+      );
+
+      // if (coverImage) {
+      //   // Seçilen kapak resmini mevcut listeden bul ve en başa taşı
+      //   // Bu sayede veritabanına giden dizide images[0] her zaman seçilen kapak olur
+      //   finalImageUrls = [
+      //     coverImage,
+      //     ...finalImageUrls.filter((url) => url !== coverImage),
+      //   ];
+      // }
+
+      let finalCoverImageUrl = coverImage;
+      if (coverImage.startsWith("blob:")) {
+        finalCoverImageUrl = previewToPublicMap[coverImage];
+      }
+
+      if (finalCoverImageUrl) {
         finalImageUrls = [
-          coverImage,
-          ...finalImageUrls.filter((url) => url !== coverImage),
+          finalCoverImageUrl,
+          // filter(url => url !== finalCoverImageUrl && url) -> hem kapak olmayanı seç hem de bozuk/boş url'leri temizle
+          ...finalImageUrls.filter(
+            (url) => url !== finalCoverImageUrl && !!url,
+          ),
         ];
       }
 
