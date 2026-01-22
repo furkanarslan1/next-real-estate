@@ -6,7 +6,7 @@ import React from "react";
 import PropertyCard, { PropertyCardData } from "../PropertyCard";
 import Pagination from "@/components/pagination/Pagination";
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 8;
 
 export default async function PropertiesList({
   selectedCategory,
@@ -57,7 +57,7 @@ export default async function PropertiesList({
       { count: "exact" },
     )
     .eq("is_active", true);
-  if (selectedCategory && selectedCategory !== "all") {
+  if (selectedCategory) {
     query = query.eq("category", selectedCategory);
   }
 
@@ -93,50 +93,36 @@ export default async function PropertiesList({
     Object.entries(searchParams).forEach(([key, value]) => {
       if (!value || coreKeys.includes(key)) return;
 
-      // furnished (boolean)
+      // furnished (boolean stored as json)
       if (key === "furnished") {
-        query = query.eq("category_data->>furnished", value === "true");
+        query = query.eq("category_data->>furnished", value);
         return;
       }
 
-      //floor
+      // floor (number but compared as string)
       if (key === "floor") {
-        query = query.filter("category_data->>floor_number", "eq", value);
+        query = query.eq("category_data->>floor", value);
         return;
       }
 
-      if (key === "total_floor") {
-        query = query.filter("category_data->>total_floor", "eq", value);
-        return;
-      }
-
-      if (key === "heating") {
-        query = query.filter(
-          "category_data->>heating",
-          "eq",
-          value.toLowerCase(),
-        );
-        return;
-      }
-
-      // building age (range)
+      // building_age (range)
       if (key === "building_age") {
         if (value.includes("-")) {
           const [min, max] = value.split("-").map(Number);
           query = query
-            .gte("category_data->>building_age", min)
-            .lte("category_data->>building_age", max);
+            .gte("category_data->>building_age::int", min)
+            .lte("category_data->>building_age::int", max);
         } else if (value.endsWith("+")) {
           const min = Number(value.replace("+", ""));
-          query = query.gte("category_data->>building_age", min);
+          query = query.gte("category_data->>building_age::int", min);
         } else {
-          query = query.eq("category_data->>building_age", Number(value));
+          query = query.eq("category_data->>building_age::int", Number(value));
         }
         return;
       }
 
-      //  default (string)
-      query = query.filter(`category_data->>${key}`, "eq", value);
+      // default string fields
+      query = query.eq(`category_data->>${key}`, value);
     });
   }
 
