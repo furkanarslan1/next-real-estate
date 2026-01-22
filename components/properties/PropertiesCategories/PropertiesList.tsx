@@ -57,7 +57,7 @@ export default async function PropertiesList({
       { count: "exact" },
     )
     .eq("is_active", true);
-  if (selectedCategory) {
+  if (selectedCategory && selectedCategory !== "all") {
     query = query.eq("category", selectedCategory);
   }
 
@@ -81,13 +81,65 @@ export default async function PropertiesList({
     "sort",
   ];
 
+  // if (searchParams) {
+  //   Object.entries(searchParams).forEach(([key, value]) => {
+  //     if (!coreKeys.includes(key) && value) {
+  //       query = query.filter(`category_data->>${key}`, "eq", value);
+  //     }
+  //   });
+  // }
+
   if (searchParams) {
     Object.entries(searchParams).forEach(([key, value]) => {
-      if (!coreKeys.includes(key) && value) {
-        query = query.filter(`category_data->>${key}`, "eq", value);
+      if (!value || coreKeys.includes(key)) return;
+
+      // furnished (boolean)
+      if (key === "furnished") {
+        query = query.eq("category_data->>furnished", value === "true");
+        return;
       }
+
+      //floor
+      if (key === "floor") {
+        query = query.filter("category_data->>floor_number", "eq", value);
+        return;
+      }
+
+      if (key === "total_floor") {
+        query = query.filter("category_data->>total_floor", "eq", value);
+        return;
+      }
+
+      if (key === "heating") {
+        query = query.filter(
+          "category_data->>heating",
+          "eq",
+          value.toLowerCase(),
+        );
+        return;
+      }
+
+      // building age (range)
+      if (key === "building_age") {
+        if (value.includes("-")) {
+          const [min, max] = value.split("-").map(Number);
+          query = query
+            .gte("category_data->>building_age", min)
+            .lte("category_data->>building_age", max);
+        } else if (value.endsWith("+")) {
+          const min = Number(value.replace("+", ""));
+          query = query.gte("category_data->>building_age", min);
+        } else {
+          query = query.eq("category_data->>building_age", Number(value));
+        }
+        return;
+      }
+
+      //  default (string)
+      query = query.filter(`category_data->>${key}`, "eq", value);
     });
   }
+
   // SORT
   if (sort === "price-asc") {
     query = query.order("price", { ascending: true });

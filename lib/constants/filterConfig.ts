@@ -16,12 +16,12 @@ export const CATEGORY_DETAILS: Record<string, FilterFieldType[]> = {
       valueType: "range",
     },
     { label: "Floor Level", key: "floor", type: "number" },
-    { label: "Total Floors", key: "total_floors", type: "number" },
+    { label: "Total Floors", key: "total_floor", type: "number" },
     {
       label: "Heating",
       key: "heating",
       type: "select",
-      options: ["Natural Gas", "Stove", "Air Conditioning"],
+      options: ["natural gas", "stove", "air conditioning"],
     },
     {
       label: "Furnished",
@@ -31,16 +31,23 @@ export const CATEGORY_DETAILS: Record<string, FilterFieldType[]> = {
       valueType: "boolean",
     },
     {
-      label: "Using Status",
-      key: "using_status",
+      label: "In Site",
+      key: "in_site",
       type: "select",
-      options: ["Empty", "Owner Occupied", "Tenant Occupied"],
+      options: ["Yes", "No"],
+      valueType: "boolean",
+    },
+    {
+      label: "Using Status",
+      key: "usage_status",
+      type: "select",
+      options: ["vacant", "tenant", "property_owner"],
     },
   ],
   land: [
     {
       label: "Zoning Status",
-      key: "zoning",
+      key: "zoning_status",
       type: "select",
       options: [
         "Residential",

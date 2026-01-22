@@ -140,14 +140,10 @@ export function StepBasicInfo({ form }: StepBasicInfoProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="residential">
-                    Residential (residential)
-                  </SelectItem>
-                  <SelectItem value="commercial">
-                    Commercial (commercial)
-                  </SelectItem>
-                  <SelectItem value="land">Land (land)</SelectItem>
-                  <SelectItem value="project">projectct (project)</SelectItem>
+                  <SelectItem value="residential">Residential</SelectItem>
+                  <SelectItem value="commercial">Commercial</SelectItem>
+                  <SelectItem value="land">Land </SelectItem>
+                  <SelectItem value="project">Project </SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
