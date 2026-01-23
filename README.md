@@ -144,14 +144,15 @@ Furkan Arslan Frontend Developer | Next.js Enthusiast
 [![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/furkanarslan1)
 
 <img src="/public/screenshots/home-hero.webp" width="600" alt="Next Real Estate hero">
-<img src="/public/screenshots/about-banner.webp" width="600" alt="Next Real Estate banner">
-<img src="/public/screenshots/about-feature.webp" width="600" alt="Next Real Estate feature">
-
 <img src="/public/screenshots/admin-properties.webp" width="600" alt="Next Real Estate properties">
-<img src="/public/screenshots/contact.webp" width="600" alt="Next Real Estate contact">
 <img src="/public/screenshots/detail-filter.webp" width="600" alt="Next Real Estate filter">
-<img src="/public/screenshots/footer.webp" width="600" alt="Next Real Estate footer">
-<img src="/public/screenshots/properties-page.webp" width="600" alt="Next Real Estate properties-page">
 <img src="/public/screenshots/property-add-form.webp" width="600" alt="Next Real Estate add-form">
 <img src="/public/screenshots/property-detail-desc.webp" width="600" alt="Next Real Estate detail-desc">
 <img src="/public/screenshots/property-detail-images.webp" width="600" alt="Next Real Estate property-detail-images">
+<img src="/public/screenshots/about-banner.webp" width="600" alt="Next Real Estate banner">
+<img src="/public/screenshots/about-features.webp" width="600" alt="Next Real Estate feature">
+
+<img src="/public/screenshots/contact.webp" width="600" alt="Next Real Estate contact">
+
+<img src="/public/screenshots/footer.webp" width="600" alt="Next Real Estate footer">
+<img src="/public/screenshots/properties-page.webp" width="600" alt="Next Real Estate properties-page">
