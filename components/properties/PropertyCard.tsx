@@ -50,16 +50,16 @@ export default function PropertyCard({
 
         {/* DETAIL */}
         <div className="p-4">
-          <h3 className="font-bold text-slate-800 text-lg truncate group-hover:text-orange-500 transition-colors">
+          <h3 className="font-bold text-slate-800 text-sm md:text-lg truncate group-hover:text-orange-500 transition-colors">
             {property.title}
           </h3>
 
-          <p className="text-orange-600 font-extrabold text-xl mt-1">
+          <p className="text-orange-600 font-extrabold text-sm md:text-xl mt-1">
             {new Intl.NumberFormat("tr-TR").format(property.price)} $
           </p>
 
           {/* FEATURES M2 ROOM COUNT VS */}
-          <div className="flex items-center gap-4 mt-4 pt-4 border-t border-slate-50 text-slate-500 text-sm">
+          <div className="flex items-center gap-4 mt-4 pt-4 border-t border-slate-50 text-slate-500 text-xs">
             <div className="flex items-center gap-1">
               <BedDouble size={16} className="text-orange-500" />
               <span>{property.category_data?.room_count || "N/A"}</span>

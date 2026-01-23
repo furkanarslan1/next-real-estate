@@ -411,7 +411,7 @@ export default function PropertiesFilter() {
                 Advanced Filters
               </SheetTitle>
             </SheetHeader>
-            <div className="mt-8 space-y-6">
+            <div className="mt-8 p-4 space-y-6">
               <DetailedFilters
                 category={category}
                 extraParams={extraParams}
@@ -420,7 +420,7 @@ export default function PropertiesFilter() {
 
               <Button
                 onClick={applyFilter}
-                className="w-full bg-orange-600 h-12 text-lg hover:bg-orange-700"
+                className="w-full  bg-orange-600 h-12 text-lg hover:bg-orange-700"
               >
                 Show Results
               </Button>

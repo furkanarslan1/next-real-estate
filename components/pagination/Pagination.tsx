@@ -60,7 +60,7 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
       {/* PREV */}
       <Link
         href={createPageLink(safePage(currentPage - 1))}
-        scroll={false}
+        scroll={true}
         aria-disabled={!hasPrev}
         className={clsx(
           "w-10 h-10 flex items-center justify-center rounded-xl border transition",
@@ -86,7 +86,7 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
           <Link
             key={`${page}-${index}`}
             href={createPageLink(page)}
-            scroll={false}
+            scroll={true}
             className={clsx(
               "w-10 h-10 flex items-center justify-center rounded-xl border text-sm transition font-medium",
               page === currentPage
@@ -102,7 +102,7 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
       {/* NEXT */}
       <Link
         href={createPageLink(safePage(currentPage + 1))}
-        scroll={false}
+        scroll={true}
         aria-disabled={!hasNext}
         className={clsx(
           "w-10 h-10 flex items-center justify-center rounded-xl border transition",

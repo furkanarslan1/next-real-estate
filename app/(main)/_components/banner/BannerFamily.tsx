@@ -12,8 +12,8 @@ export default function BannerFamily() {
           className="object-cover object-center rounded-lg"
         />
       </div>
-      <div className="bg-slate-300 p-4 rounded-md space-y-2">
-        <h1 className="font-bold">
+      <div className="bg-slate-100 text-gray-500 p-4 rounded-md space-y-2">
+        <h1 className="font-bold text-gray-600">
           The Easiest Way to Find the Right Home for Your Family
         </h1>
         <p className="text-sm ">

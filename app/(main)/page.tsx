@@ -12,6 +12,7 @@ import PropertiesCategories from "@/components/properties/PropertiesCategories/P
 import SortFilter from "@/components/properties/SortFilter";
 import PropertiesList from "@/components/properties/PropertiesCategories/PropertiesList";
 import PropertyCardSkeleton from "@/components/properties/PropertyCardSkeleton";
+import AboutStory from "./about/_components/AboutStory";
 
 export default async function Home({
   searchParams,
@@ -35,6 +36,7 @@ export default async function Home({
       <Suspense key={suspenseKey} fallback={<PropertyCardSkeleton />}>
         <PropertiesList sort={sort} selectedCategory={category} params="home" />
       </Suspense>
+      <AboutStory />
       <BannerFamily />
       <AboutStats />
     </div>

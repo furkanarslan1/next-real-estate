@@ -166,7 +166,7 @@ export default async function PropertiesList({
         Total <span className="font-bold text-foreground">{count || 0}</span>{" "}
         ads founded.
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10 ">
         {adsData && adsData.length > 0 ? (
           adsData.map((ad: PropertyCardData) => (
             <PropertyCard key={ad.id} property={ad} />

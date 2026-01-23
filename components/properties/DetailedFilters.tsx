@@ -38,7 +38,7 @@ export default function DetailedFilters({
   };
 
   return (
-    <div className="grid grid-cols-1 gap-6 py-4">
+    <div className="grid grid-cols-1 gap-6 px-6">
       {fields.map((field) => (
         <div key={field.key} className="space-y-2">
           <Label className="text-sm font-bold text-slate-700">

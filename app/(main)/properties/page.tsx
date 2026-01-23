@@ -12,11 +12,15 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | undefined };
+  // 1. Burayı Promise olarak tanımlıyoruz
+  searchParams: Promise<{ [key: string]: string | undefined }>;
 }): Promise<Metadata> {
+  // 2. searchParams'ı asenkron olarak bekliyoruz
+  const resolvedParams = await searchParams;
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
-  const category = searchParams.category || "residential";
+  const category = resolvedParams.category || "residential";
 
   const titleMap: Record<string, string> = {
     residential: "Residential Properties",
@@ -29,8 +33,8 @@ export async function generateMetadata({
   const description = `Browse ${title.toLowerCase()} with real prices, photos and detailed information.`;
 
   const isFiltered =
-    Object.keys(searchParams).length > 1 ||
-    (Object.keys(searchParams).length === 1 && !searchParams.category);
+    Object.keys(resolvedParams).length > 1 ||
+    (Object.keys(resolvedParams).length === 1 && !resolvedParams.category);
 
   return {
     title: `${title} | Modern Real Estate`,
@@ -38,7 +42,7 @@ export async function generateMetadata({
 
     alternates: {
       canonical: `${siteUrl}/properties${
-        searchParams.category ? `?category=${category}` : ""
+        resolvedParams.category ? `?category=${category}` : ""
       }`,
     },
 
