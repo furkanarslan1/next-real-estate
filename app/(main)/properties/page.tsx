@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import PropertiesCategories from "@/components/properties/PropertiesCategories/PropertiesCategories";
-import PropertiesFilter from "@/components/properties/PropertiesCategories/PropertiesFilter";
-import PropertiesList from "@/components/properties/PropertiesCategories/PropertiesList";
+import PropertiesCategories from "@/components/properties/PropertiesCategories";
+import PropertiesFilter from "@/components/properties/PropertiesFilter";
+import PropertiesList from "@/components/properties/PropertiesList";
 import { AdsListSkeleton } from "@/components/properties/PropertyCardSkeleton";
 import SortFilter from "@/components/properties/SortFilter";
 import { STATIC_CATEGORIES } from "@/lib/constants/categories";
@@ -89,9 +89,19 @@ export default async function PropertiesPage({
       <div className=" space-y-8">
         <div className="h-16 bg-linear-to-bl from-slate-950 to-slate-700"></div>
         <div className="max-w-7xl mx-auto px-4  space-y-4">
-          <PropertiesFilter />
+          <Suspense
+            fallback={
+              <div className="h-20 bg-slate-100 animate-pulse rounded-xl" />
+            }
+          >
+            <PropertiesFilter />
+          </Suspense>
           <PropertiesCategories categories={STATIC_CATEGORIES || []} />
-          <SortFilter />
+          <Suspense
+            fallback={<div className="h-10 w-32 bg-slate-100 animate-pulse" />}
+          >
+            <SortFilter />
+          </Suspense>
           <Suspense key={suspenseKey} fallback={<AdsListSkeleton />}>
             <PropertiesList
               selectedCategory={category}

@@ -7,10 +7,10 @@ import { STATIC_CATEGORIES } from "@/lib/constants/categories";
 
 import BannerFamily from "./_components/banner/BannerFamily";
 import AboutStats from "./about/_components/AboutStats";
-import PropertiesFilter from "@/components/properties/PropertiesCategories/PropertiesFilter";
-import PropertiesCategories from "@/components/properties/PropertiesCategories/PropertiesCategories";
+import PropertiesFilter from "@/components/properties/PropertiesFilter";
+import PropertiesCategories from "@/components/properties/PropertiesCategories";
 import SortFilter from "@/components/properties/SortFilter";
-import PropertiesList from "@/components/properties/PropertiesCategories/PropertiesList";
+import PropertiesList from "@/components/properties/PropertiesList";
 import PropertyCardSkeleton from "@/components/properties/PropertyCardSkeleton";
 import AboutStory from "./about/_components/AboutStory";
 

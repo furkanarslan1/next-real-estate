@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
-import React from "react";
+import React, { Suspense } from "react";
 import PropertyAddForm from "../../_components/PropertyAddForm";
 
 interface EditPageProps {
@@ -25,7 +25,11 @@ export default async function EditPropertyPage({ params }: EditPageProps) {
       <h1 className="text-2xl font-bold mb-6">
         Edit Property: {property.title}
       </h1>
-      <PropertyAddForm initialData={property} />
+      <Suspense
+        fallback={<div className="p-10 text-center">Loading Edit Form...</div>}
+      >
+        <PropertyAddForm initialData={property} />
+      </Suspense>
     </div>
   );
 }

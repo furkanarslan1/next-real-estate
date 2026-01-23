@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import React from "react";
 
-import PropertyCard, { PropertyCardData } from "../PropertyCard";
+import PropertyCard, { PropertyCardData } from "./PropertyCard";
 import Pagination from "@/components/pagination/Pagination";
 
 const ITEMS_PER_PAGE = 8;

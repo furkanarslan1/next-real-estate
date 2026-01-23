@@ -21,7 +21,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Settings2 } from "lucide-react";
-import DetailedFilters from "../DetailedFilters";
+import DetailedFilters from "./DetailedFilters";
 import { CATEGORY_DETAILS } from "@/lib/constants/filterConfig";
 
 function normalizeFilterValue(
