@@ -61,10 +61,23 @@ export function FeatureField({ feature, field }: FeatureFieldProps) {
                 </Select>
               );
             case "number":
+              return (
+                <Input
+                  type="number"
+                  placeholder={`Enter ${feature.label.toLowerCase()}`}
+                  {...field}
+                  value={field.value ?? ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+
+                    field.onChange(val === "" ? "" : Number(val));
+                  }}
+                />
+              );
             case "input":
               return (
                 <Input
-                  type={feature.type === "number" ? "number" : "text"}
+                  type="text"
                   placeholder={`Enter ${feature.label.toLowerCase()}`}
                   {...field}
                   value={field.value ?? ""}

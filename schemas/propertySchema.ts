@@ -21,16 +21,16 @@ export const propertySchema = z.object({
   category_data: z
     .object({
       room_count: z.string().optional(),
-      building_age: z.string().optional(),
-      floor_number: z.string().optional(),
-      total_floor: z.string().optional(),
+      building_age: z.coerce.number().optional(),
+      floor_number: z.coerce.number().optional(),
+      total_floor: z.coerce.number().optional(),
       kitchen: z.enum(["closed", "open"]).default("closed"),
       elevator: z.enum(["yes", "no"]).default("yes"),
       heating: z
         .enum(["natural gas", "air conditioning", "stove"])
         .default("natural gas"),
-      bathrooms: z.string().optional(),
-      balconies: z.string().optional(),
+      bathrooms: z.coerce.number().optional(),
+      balconies: z.coerce.number().optional(),
       maintenance_fee: z.coerce.number().min(0).optional().default(0),
       parking: z.enum(["no", "open", "close"]).default("no"),
       usage_status: z
