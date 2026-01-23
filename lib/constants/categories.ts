@@ -9,5 +9,5 @@ export const STATIC_CATEGORIES = [
   { id: "1", name: "Residential", slug: "residential" },
   { id: "2", name: "Commercial", slug: "commercial" },
   { id: "3", name: "Land", slug: "land" },
-  { id: "4", name: "projectct", slug: "projectct" },
+  { id: "4", name: "project", slug: "project" },
 ];
